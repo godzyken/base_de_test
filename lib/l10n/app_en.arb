@@ -1,0 +1,23 @@
+{
+  "welcome": "WelCome",
+  "welcomeBack": "WelCome Back",
+  "cancel": "Cancel",
+  "create": "Create",
+  "description": "Description",
+  "emailInvalid": "Invalid email",
+  "or": "or",
+  "organizationName": "Organization name",
+  "organizationNameNotEmpty": "Organization name must not be empty",
+  "signInWithGoogle": "Sign In With Google",
+  "signInWithEmailPassword": "Sign In With Email and Password",
+  "somethingWentWrong": "Something went wrong",
+  "yourOrganizations": "Your organizations",
+  "enterUsername": "Enter Username",
+  "userName": "Name",
+  "enterUserEmail": "Enter User Email",
+  "userEmail": "Email",
+  "enterUserPassword": "Enter User Password",
+  "userPassword": "Password",
+  "submit": "Submit",
+  "loading": "Loading..."
+}
