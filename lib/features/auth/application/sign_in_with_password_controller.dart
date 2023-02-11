@@ -1,4 +1,3 @@
-import 'package:base_de_test/features/auth/auth_provider.dart';
 import 'package:base_de_test/features/auth/domain/entities/user_properties/email.dart';
 import 'package:base_de_test/features/auth/infrastructure/repositories/auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,7 +51,3 @@ class SignInWithPasswordController extends StateNotifier<SignInState> {
     }
   }
 }
-
-final signInNotifierProvider =
-    StateNotifierProvider<SignInWithPasswordController, SignInState>((ref) =>
-        SignInWithPasswordController(ref.watch(authRepositoryProvider)));

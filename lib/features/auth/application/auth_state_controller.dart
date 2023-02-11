@@ -17,6 +17,14 @@ class AuthStateController extends StateNotifier<ss.AuthState> {
   final AuthRepository _authRepository;
   late final StreamSubscription _streamSubscription;
 
+  ss.AuthStatus? validator(AuthUser? value) {
+    if (value!.id.isEmpty) {
+      return ss.AuthStatus.authenticated;
+    } else {
+      return ss.AuthStatus.unauthenticated;
+    }
+  }
+
   void _onUserChanged(AuthUser user) {
     if (user.id.isEmpty) {
       state = const ss.AuthState.unauthenticated();

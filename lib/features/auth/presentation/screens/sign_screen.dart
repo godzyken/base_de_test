@@ -1,4 +1,3 @@
-import 'package:base_de_test/features/auth/application/sign_in_with_password_controller.dart';
 import 'package:base_de_test/features/auth/presentation/widgets/email_field.dart';
 import 'package:base_de_test/features/auth/presentation/widgets/password_field.dart';
 import 'package:base_de_test/features/common/presentation/utils/extensions/submit_button.dart';
@@ -7,11 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
 
+import '../../auth_provider.dart';
+
 class SignInScreen extends ConsumerWidget {
   const SignInScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final signInController = ref.watch(signInNotifierProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text(context.tr.signInWithEmailPassword),
@@ -24,7 +26,7 @@ class SignInScreen extends ConsumerWidget {
               const EmailField(),
               const PasswordField(),
               SubmitButton(
-                onPressed: () {},
+                onPressed: () => signInController.signInWithPassword(),
                 enabled: ref.watch(signInNotifierProvider).status ==
                     FormzStatus.valid,
                 text: context.tr.submit,

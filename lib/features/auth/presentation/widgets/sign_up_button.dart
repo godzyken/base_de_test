@@ -1,8 +1,9 @@
-import 'package:base_de_test/features/auth/application/sign_up_controller.dart';
 import 'package:base_de_test/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
+
+import '../../auth_provider.dart';
 
 class SignUpButton extends ConsumerWidget {
   const SignUpButton({Key? key}) : super(key: key);

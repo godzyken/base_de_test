@@ -14,17 +14,6 @@ class AuthState with _$AuthState {
   @JsonSerializable(
     fieldRename: FieldRename.snake,
   )
-  AuthStatus? validator(AuthUser? value) {
-    if (value!.id.isEmpty) {
-      return AuthStatus.authenticated;
-    } else {
-      return AuthStatus.unauthenticated;
-    }
-  }
-
-  @JsonSerializable(
-    fieldRename: FieldRename.snake,
-  )
   const factory AuthState.authenticated({
     @JsonKey(
       defaultValue: 'AuthStatus',

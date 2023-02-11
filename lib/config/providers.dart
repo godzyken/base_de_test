@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:base_de_test/features/auth/auth_provider.dart';
 import 'package:base_de_test/features/counter_app/infrastructure/entities/environment.dart';
-import 'package:base_de_test/my_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,5 +32,5 @@ Future<void> initializeProvider(ProviderContainer container) async {
   await container.read(sharedPreferencesProvider.future);
   await container.read(supabaseProvider.future);
 
-  container.read(counterProvider);
+  container.read(authControllerProvider);
 }

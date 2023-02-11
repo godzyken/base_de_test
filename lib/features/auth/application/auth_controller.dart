@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:base_de_test/features/auth/auth_provider.dart';
 import 'package:base_de_test/features/auth/infrastructure/repositories/auth_repository.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -21,6 +23,8 @@ class AuthController extends StateNotifier<UserEntity?> {
     _updateAuthState();
 
     if (state == null) {
+      await Future.delayed(const Duration(seconds: 3));
+
       await _handleInitialDeepLink();
     }
 
@@ -35,23 +39,27 @@ class AuthController extends StateNotifier<UserEntity?> {
   }
 
   Future<void> _handleInitialDeepLink() async {
-    final initialLink = await getInitialLink();
-    if (!(initialLink?.contains('refresh_token') ?? false)) {
-      return;
+    try {
+      final initialLink = await getInitialLink();
+      if (!(initialLink?.contains('refresh_token') ?? false)) {
+        return;
+      }
+
+      final refreshTokenQueryParams = initialLink
+          ?.split('&')
+          .firstWhere((element) => element.contains('refresh_token'));
+
+      final refreshToken = refreshTokenQueryParams
+          ?.substring(refreshTokenQueryParams.indexOf('=') + 1);
+
+      if (refreshToken == null) return;
+
+      final res = await _repository.setSession(refreshToken);
+      state = res.fold((l) => null, (r) => r);
+      _updateAuthState();
+    } on PlatformException catch (e) {
+      log(e.code);
     }
-
-    final refreshTokenQueryParams = initialLink
-        ?.split('&')
-        .firstWhere((element) => element.contains('refresh_token'));
-
-    final refreshToken = refreshTokenQueryParams
-        ?.substring(refreshTokenQueryParams.indexOf('=') + 1);
-
-    if (refreshToken == null) return;
-
-    final res = await _repository.setSession(refreshToken);
-    state = res.fold((l) => null, (r) => r);
-    _updateAuthState();
   }
 
   Future<void> signOut() async {

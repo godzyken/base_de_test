@@ -1,4 +1,3 @@
-import 'package:base_de_test/features/auth/auth_provider.dart';
 import 'package:base_de_test/features/auth/domain/entities/user_properties/email.dart';
 import 'package:base_de_test/features/auth/domain/entities/user_properties/name.dart';
 import 'package:base_de_test/features/auth/domain/entities/user_properties/password.dart';
@@ -65,7 +64,3 @@ class SignUpController extends StateNotifier<SignUpState> {
     }
   }
 }
-
-final signUpProvider =
-    StateNotifierProvider.autoDispose<SignUpController, SignUpState>(
-        (ref) => SignUpController(ref.watch(authRepositoryProvider)));

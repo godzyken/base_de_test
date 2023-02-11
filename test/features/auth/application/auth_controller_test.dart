@@ -32,6 +32,11 @@ void main() {
 
     final container = makeProviderContainer(authRepository);
 
+    // when(authRepository.authClient.signUp(password: 'password'))
+    //     .thenAnswer((value) async {
+    //   return http.Response('{"password": "password"}', 200);
+    // });
+
     final listener = Listener<AsyncValue<void>>();
 
     container.listen(authControllerProvider, (previous, next) => listener,

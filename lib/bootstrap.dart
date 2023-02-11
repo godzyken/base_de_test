@@ -2,6 +2,7 @@ import 'package:base_de_test/config/providers.dart' as providers;
 import 'package:base_de_test/flavors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stack_trace/stack_trace.dart' as stack_trace;
 
 Future<ProviderContainer> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +13,12 @@ Future<ProviderContainer> bootstrap() async {
     ],
     observers: [if (F.appFlavor == Flavor.local) _Logger()],
   );
+
+  FlutterError.demangleStackTrace = (StackTrace stack) {
+    if (stack is stack_trace.Trace) return stack.vmTrace;
+    if (stack is stack_trace.Chain) return stack.toTrace().vmTrace;
+    return stack;
+  };
 
   await providers.initializeProvider(container);
   return container;
