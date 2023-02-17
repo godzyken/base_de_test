@@ -26,7 +26,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 final authStateListenable = ValueNotifier<bool>(false);
 
 final authControllerProvider =
-    StateNotifierProvider.autoDispose<AuthController, UserEntity?>(
+    StateNotifierProvider<AuthController, UserEntity?>(
         (ref) => AuthController(ref));
 
 final signInWithGoogleProvider =

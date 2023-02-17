@@ -1,3 +1,4 @@
+import 'package:base_de_test/features/auth/domain/entities/user/user_entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

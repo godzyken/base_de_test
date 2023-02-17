@@ -19,5 +19,6 @@
   "enterUserPassword": "Enter User Password",
   "userPassword": "Password",
   "submit": "Submit",
+  "signOut": "sign out",
   "loading": "Loading..."
 }

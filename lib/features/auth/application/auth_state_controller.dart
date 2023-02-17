@@ -25,8 +25,8 @@ class AuthStateController extends StateNotifier<ss.AuthState> {
     }
   }
 
-  void _onUserChanged(AuthUser user) {
-    if (user.id.isEmpty) {
+  void _onUserChanged(AuthUser? user) {
+    if (user!.id.isEmpty) {
       state = const ss.AuthState.unauthenticated();
     } else {
       state = ss.AuthState.authenticated(user: user);

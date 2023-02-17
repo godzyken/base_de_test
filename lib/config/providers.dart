@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:base_de_test/features/auth/auth_provider.dart';
 import 'package:base_de_test/features/counter_app/infrastructure/entities/environment.dart';
+import 'package:base_de_test/features/transactions/transaction_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 import '../flavors.dart';
+
+final databaseProvider = Provider((ref) => TransactionProvider.instance);
 
 final sharedPreferencesProvider =
     FutureProvider((ref) => SharedPreferences.getInstance());

@@ -18,7 +18,7 @@ class AuthRepository implements AuthRepositoryInterface {
       ? null
       : UserEntity.fromJson(authClient.currentUser!.toJson());
 
-  Stream<supabase.AuthUser>? get user => null;
+  Stream<supabase.AuthUser?>? get user => null;
 
   @override
   void authStateChange(
