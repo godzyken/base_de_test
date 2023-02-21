@@ -5,4 +5,5 @@ abstract class SourceBase {
   Future<BoatEntity> insertBoat(final BoatEntity boatEntity);
   Future<void> updateBoat(final BoatEntity boatEntity);
   Future<void> deleteBoat(final int id);
+  Future close();
 }

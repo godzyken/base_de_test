@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:base_de_test/features/transactions/domain/entities/boat_entity.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat_id.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_id.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 

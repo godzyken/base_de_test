@@ -1,7 +1,7 @@
-import 'package:base_de_test/features/transactions/domain/entities/boat_id.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_id.dart';
 
-import '../entities/boat_entity.dart';
-import '../entities/boat_list_entity.dart';
+import '../entities/boat/boat_entity.dart';
+import '../entities/boat/boat_list_entity.dart';
 
 abstract class BoatsRepository {
   Future<BoatList> getBoatList();

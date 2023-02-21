@@ -1,6 +1,8 @@
+import 'dart:developer';
+
 import 'package:base_de_test/features/transactions/application/datasource/database/source_base.dart';
 import 'package:base_de_test/features/transactions/application/datasource/entity/boats_entity.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 
 class BoatDatabaseImpl implements SourceBase {
@@ -72,24 +74,42 @@ class BoatDatabaseImpl implements SourceBase {
   }
 
   Future<Database> _initDatabase() async {
-    return openDatabase(
-      join(await getDatabasesPath(), _databaseName),
-      onCreate: (db, _) {
-        db.execute('''
-          CREATE TABLE $_tableName(
-            $_columnId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            $_columnName TEXT NOT NULL,
-            $_columnOwner TEXT NOT NULL,
-            $_columnAvailable BOOLEAN NOT NULL,
-            $_columnIdentityNumber TEXT NOT NULL,
-            $_columnCategoryCnp TEXT NOT NULL,
-            $_columnRentedAt INTEGER NOT NULL,
-            $_columnReturnAt INTEGER NOT NULL,
-            $_columnRole TEXT NOT NULL,
-          )
-        ''');
-      },
-      version: _databaseVersion,
-    );
+    if (_database != null) {
+      return _database!;
+    }
+
+    try {
+      var databasePath = await getDatabasesPath();
+      String p = path.join(databasePath, _databaseName);
+      return openDatabase(
+        p,
+        onCreate: (db, _) {
+          db.execute('''
+          CREATE TABLE IF NOT EXISTS $_tableName(
+              $_columnId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+              $_columnName TEXT NOT NULL,
+              $_columnOwner TEXT NOT NULL,
+              $_columnAvailable BOOLEAN NOT NULL,
+              $_columnIdentityNumber TEXT NOT NULL,
+              $_columnCategoryCnp TEXT NOT NULL,
+              $_columnRentedAt INTEGER NOT NULL,
+              $_columnReturnAt INTEGER NOT NULL,
+              $_columnRole TEXT NOT NULL
+            )
+          ''');
+        },
+        version: _databaseVersion,
+      );
+    } on Exception catch (e) {
+      log('database initialisation error : $e');
+      return database;
+    }
+  }
+
+  @override
+  Future close() async {
+    final db = await database;
+
+    db.close();
   }
 }

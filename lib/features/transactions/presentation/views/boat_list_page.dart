@@ -18,7 +18,7 @@ class BoatListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Boat app'),
+        title: const Text('Boat location app'),
       ),
       body: Column(
         children: [
@@ -31,7 +31,7 @@ class BoatListPage extends ConsumerWidget {
             return ref.watch(_filteredBoatListProvider).maybeWhen(
                 success: (content) =>
                     _buildBoatListContainerWidget(ref, content),
-                error: (e) => ErrorWidget(e),
+                error: (e) => Expanded(child: Center(child: ErrorWidget(e))),
                 orElse: () => const Expanded(
                         child: Center(
                       child: CircularProgressIndicator(),
@@ -47,7 +47,7 @@ class BoatListPage extends ConsumerWidget {
     return Expanded(child: _buildBoatListWidget(ref, boatList));
   }
 
-  _buildBoatListWidget(final WidgetRef ref, final BoatList boatList) {
+  Widget _buildBoatListWidget(final WidgetRef ref, final BoatList boatList) {
     if (boatList.length == 0) {
       return const Center(
         child: Text('No Boat'),
@@ -65,7 +65,7 @@ class BoatListPage extends ConsumerWidget {
     }
   }
 
-  _buildBoatItemCardWidget(
+  Widget _buildBoatItemCardWidget(
       final BuildContext context, final WidgetRef ref, final Boat boat) {
     return InkWell(
       child: Card(
@@ -84,7 +84,7 @@ class BoatListPage extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    DateFormat('yyyy/MM/dd').format(boat.rentedAt!),
+                    DateFormat('dd/MM/yyyy').format(boat.rentedAt!),
                     style: context.textTheme.bodySmall,
                   ),
                   const SizedBox(
@@ -148,6 +148,8 @@ class BoatListPage extends ConsumerWidget {
 
 class ChipsBarWidget extends ConsumerWidget {
   final _provider = filterKindViewModelStateNotifierProvider;
+
+  ChipsBarWidget({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Consumer(builder: (context, ref, _) {
@@ -155,40 +157,40 @@ class ChipsBarWidget extends ConsumerWidget {
       ref.watch(_provider);
       return SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8),
-          child: Row(
-            children: [
-              InputChip(
-                label: Text('All'),
-                selected: viewModel.isFilterByAll(),
-                onSelected: (_) => viewModel.filterByAll(),
-                selectedColor:
-                    viewModel.isFilterByAll() ? Colors.lightGreen : null,
-              ),
-              const SizedBox(
-                width: 8,
-              ),
-              InputChip(
-                label: Text('Available'),
-                selected: viewModel.isFilterByAvailable(),
-                onSelected: (_) => viewModel.filterByAvailable(),
-                selectedColor:
-                    viewModel.isFilterByAvailable() ? Colors.lightGreen : null,
-              ),
-              const SizedBox(
-                width: 8,
-              ),
-              InputChip(
-                label: Text('Unavailable'),
-                selected: viewModel.isFilterByUnavailable(),
-                onSelected: (_) => viewModel.filterByUnavailable(),
-                selectedColor: viewModel.isFilterByUnavailable()
-                    ? Colors.lightGreen
-                    : null,
-              ),
-            ],
-          ),
-        ),
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: Row(
+              children: [
+                InputChip(
+                  label: const Text('All'),
+                  selected: viewModel.isFilterByAll(),
+                  onSelected: (_) => viewModel.filterByAll(),
+                  selectedColor:
+                      viewModel.isFilterByAll() ? Colors.lightGreen : null,
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                InputChip(
+                  label: const Text('Available'),
+                  selected: viewModel.isFilterByAvailable(),
+                  onSelected: (_) => viewModel.filterByAvailable(),
+                  selectedColor: viewModel.isFilterByAvailable()
+                      ? Colors.lightGreen
+                      : null,
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                InputChip(
+                  label: const Text('Unavailable'),
+                  selected: viewModel.isFilterByUnavailable(),
+                  onSelected: (_) => viewModel.filterByUnavailable(),
+                  selectedColor: viewModel.isFilterByUnavailable()
+                      ? Colors.lightGreen
+                      : null,
+                ),
+              ],
+            )),
       );
     });
   }

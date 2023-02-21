@@ -1,9 +1,13 @@
 import 'package:base_de_test/features/transactions/presentation/viewmodel/boatlist/boat_list_viewmodel.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/entities/entities.dart';
 
 class BoatLocationFormViewModel {
+  BoatLocationFormViewModel(final Boat? boat, this._boatListViewModel) {
+    _initBoat(boat);
+  }
   late BoatId _id;
   final BoatListViewModel _boatListViewModel;
   var _name = '';
@@ -14,15 +18,14 @@ class BoatLocationFormViewModel {
   var _isAvailable = false;
   var _types = TypesOfBoat.values;
   var cnp = CategoriesCNP.values;
-  var _initdate = DateTime.now();
-  var _startAt = DateTime.now();
-  var _stopAt = DateTime.now();
+  final DateTime _initDate = DateTime(DateTime.now().year);
+  final DateTime _minimal = DateTime(DateTime.now().year);
+  final DateTime _maximal = DateTime(DateTime.now().year + 5);
+  final DateTimeRange _initDateTimeRange = DateTimeRange(
+      start: DateTime.now(), end: DateTime.now().add(const Duration(days: 7)));
+
   var _raison = '';
   var _isNewBoat = false;
-
-  BoatLocationFormViewModel(final Boat? boat, this._boatListViewModel) {
-    _initBoat(boat);
-  }
 
   _initBoat(final Boat? boat) {
     if (boat == null) {
@@ -34,8 +37,6 @@ class BoatLocationFormViewModel {
       _types = [];
       _owner = boat.ownerEntity;
       _isAvailable = boat.isAvailable;
-      _startAt = boat.rentedAt!;
-      _stopAt = boat.returnedAt!;
       _raison = boat.role!;
     }
   }
@@ -49,7 +50,7 @@ class BoatLocationFormViewModel {
         _boatIdentity.single,
         _types.single,
         cnp.single,
-        _startAt,
+        _initDate,
         _raison,
       );
     } else {
@@ -60,7 +61,10 @@ class BoatLocationFormViewModel {
           types: _types.single,
           identityNumber: _boatIdentity.single,
           cnp: cnp.single,
-          isAvailable: _isAvailable);
+          isAvailable: _isAvailable,
+          rentedAt: _initDateTimeRange.start,
+          returnedAt: _initDateTimeRange.end,
+          role: _raison);
 
       _boatListViewModel.updateBoat(newBoat);
     }
@@ -68,7 +72,7 @@ class BoatLocationFormViewModel {
 
   deleteBoatLocation() {
     if (!_isNewBoat) {
-      _stopAt;
+      _initDateTimeRange.end;
       return _boatListViewModel.deleteLocation(_id);
     }
   }
@@ -81,11 +85,12 @@ class BoatLocationFormViewModel {
   bool initialAvailableValue() => _isAvailable;
   List<TypesOfBoat> initialTypesOfBoatValue() => _types;
   List<CategoriesCNP> initialCnpValue() => cnp;
-  DateTime initialLocDateValue() => _initdate;
-  DateTime datePickerFirstDate() => _startAt;
-  DateTime datePickerLastDate() => _stopAt;
+  DateTime initialLocDateValue() => _initDate;
+  DateTime datePickerFirstDate() => _minimal;
+  DateTime datePickerLastDate() => _maximal;
   String initialRoleValue() => _raison;
   bool isNewBoatValue() => !_isNewBoat;
+  DateTimeRange initDateRangeValue() => _initDateTimeRange;
 
   setName(final String value) => _name = value;
   setRole(final String value) => _raison = value;
@@ -100,8 +105,8 @@ class BoatLocationFormViewModel {
   setTypesBoat(final List<TypesOfBoat> value) => _types = value;
   setIsAvailable(final bool value) => _isAvailable = value;
   setCategoryCnp(final List<CategoriesCNP> value) => cnp = value;
-  setStartLocation(final DateTime value) => _startAt = value;
-  setStopLocation(final DateTime value) => _stopAt = value;
+  setStartLocation(final DateTime value) => _initDateTimeRange.start;
+  setStopLocation(final DateTime value) => _initDateTimeRange.end;
 
   String? validateName() {
     if (_name.isEmpty) {
@@ -114,7 +119,7 @@ class BoatLocationFormViewModel {
   }
 
   String? validateDateInset() {
-    if (_isNewBoat && _startAt.isBefore(DateTime.now())) {
+    if (_isNewBoat && _initDateTimeRange.start.isBefore(_initDate)) {
       return 'Start date of location must be after today\'s date';
     } else {
       return null;
@@ -122,10 +127,11 @@ class BoatLocationFormViewModel {
   }
 
   String? validateDateOffset() {
-    if (!_isNewBoat && _stopAt.isBefore(DateTime.now())) {
+    if (!_isNewBoat && _initDateTimeRange.end.isBefore(_initDate)) {
       setIsAvailable(true);
       return 'this boat is available';
-    } else if (_isNewBoat && _startAt.isAtSameMomentAs(createOrUpdateBoat())) {
+    } else if (_isNewBoat &&
+        _initDateTimeRange.start.isAtSameMomentAs(createOrUpdateBoat())) {
       setIsAvailable(true);
       return 'this boat is available';
     } else {

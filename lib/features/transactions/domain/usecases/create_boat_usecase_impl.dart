@@ -1,4 +1,4 @@
-import 'package:base_de_test/features/transactions/domain/entities/boat_entity.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
 import 'package:base_de_test/features/transactions/domain/repositories/boats_repository.dart';
 
 import 'create_boat_usecase.dart';

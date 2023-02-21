@@ -1,9 +1,9 @@
 import 'package:base_de_test/features/transactions/application/datasource/database/source_base.dart';
 import 'package:base_de_test/features/transactions/application/datasource/mapper/boat_list_mapper.dart';
 import 'package:base_de_test/features/transactions/application/datasource/mapper/boat_mapper.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat_entity.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat_id.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat_list_entity.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_id.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_list_entity.dart';
 import 'package:base_de_test/features/transactions/domain/repositories/boats_repository.dart';
 
 class BoatsRepositoryImpl implements BoatsRepository {

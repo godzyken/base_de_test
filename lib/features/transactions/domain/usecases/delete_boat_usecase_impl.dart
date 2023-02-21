@@ -1,4 +1,4 @@
-import 'package:base_de_test/features/transactions/domain/entities/boat_id.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_id.dart';
 import 'package:base_de_test/features/transactions/domain/repositories/boats_repository.dart';
 
 import 'delete_boat_usecase.dart';

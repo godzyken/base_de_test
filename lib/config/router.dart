@@ -5,7 +5,7 @@ import 'package:base_de_test/features/auth/presentation/screens/sign_up_screen.d
 import 'package:base_de_test/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:base_de_test/features/counter_app/presentation/home/view/my_home_page.dart';
 import 'package:base_de_test/features/profile/presentation/screens/profile_screen.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat_entity.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
 import 'package:base_de_test/features/transactions/presentation/views/boat_form_page.dart';
 import 'package:base_de_test/features/transactions/presentation/views/boat_list_page.dart';
 import 'package:flutter/cupertino.dart';

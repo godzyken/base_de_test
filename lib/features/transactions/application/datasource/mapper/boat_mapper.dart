@@ -1,6 +1,6 @@
 import 'package:base_de_test/features/transactions/application/datasource/entity/boats_entity.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat_entity.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat_id.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat/boat_id.dart';
 
 class BoatMapper {
   static Boat transformToModel(final BoatEntity entity) {
