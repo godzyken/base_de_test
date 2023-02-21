@@ -29,17 +29,6 @@ class BoatNotifier extends StateNotifier<Boat> {
   }
 }
 
-final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) =>
-    BoatNotifier(const Boat(
-        boatId: BoatId(value: 0),
-        name: 'name',
-        ownerEntity: OwnerEntity(
-            id: 0, name: 'name', phone: 'phone', address: Address()),
-        types: TypesOfBoat.yacht,
-        identityNumber: IdentityNumber.cin,
-        cnp: CategoriesCNP.c,
-        isAvailable: false)));
-
 class TypesOfBoatNotifier extends StateNotifier<List<TypesOfBoat>> {
   TypesOfBoatNotifier(super.state);
 
@@ -67,6 +56,140 @@ class TypesOfBoatNotifier extends StateNotifier<List<TypesOfBoat>> {
   }
 }
 
+class CategoryCnpNotifier extends StateNotifier<List<CategoriesCNP>> {
+  CategoryCnpNotifier(super.state);
+
+  String? selectCategoriesCNP(CategoriesCNP cat) {
+    switch (cat) {
+      case CategoriesCNP.a:
+        cat = CategoriesCNP.a;
+        return cat.name;
+      case CategoriesCNP.b:
+        cat = CategoriesCNP.b;
+        return cat.name;
+      case CategoriesCNP.c:
+        cat = CategoriesCNP.c;
+        return cat.name;
+      case CategoriesCNP.d:
+        cat = CategoriesCNP.d;
+        return cat.name;
+    }
+  }
+}
+
+class OwnerEntityNotifier extends StateNotifier<OwnerEntity> {
+  OwnerEntityNotifier(super.state);
+
+  void updateOwnerId(int i) {
+    state = state.copyWith(id: i);
+  }
+
+  void updateOwnerName(String n) {
+    state = state.copyWith(name: n);
+  }
+
+  void updateOwnerPhone(String p) {
+    state = state.copyWith(phone: p);
+  }
+
+  void updateOwnerAddress(Address? p) {
+    state = state.copyWith(address: p!);
+  }
+}
+
+class AddressNotifier extends StateNotifier<Address> {
+  AddressNotifier(super.state);
+
+  void updateCity(String c) {
+    state = state.copyWith(city: c);
+  }
+
+  void updateStreet(String s) {
+    state = state.copyWith(street: s);
+  }
+
+  void updateZipCode(String z) {
+    state = state.copyWith(zipcode: z);
+  }
+
+  void updateSuite(String s) {
+    state = state.copyWith(suite: s);
+  }
+
+  void updateGeo(Geo g) {
+    state = state.copyWith(geo: g);
+  }
+}
+
+class GeoNotifier extends StateNotifier<Geo> {
+  GeoNotifier(super.state);
+
+  void updateLat(double d) {
+    state = state.copyWith(lat: d);
+  }
+
+  void updateLong(double lon) {
+    state = state.copyWith(lng: lon);
+  }
+}
+
+class IdentityNumberNotifier extends StateNotifier<List<IdentityNumber>> {
+  IdentityNumberNotifier(super.state);
+
+  String? selectIdentityNumber(IdentityNumber number) {
+    switch (number) {
+      case IdentityNumber.cin:
+        number = IdentityNumber.cin;
+        return number.name;
+      case IdentityNumber.hin:
+        number = IdentityNumber.hin;
+        return number.name;
+      case IdentityNumber.win:
+        number = IdentityNumber.win;
+        return number.name;
+    }
+  }
+}
+
+// providers
+final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) =>
+    BoatNotifier(const Boat(
+        boatId: BoatId(value: 0),
+        name: 'name',
+        ownerEntity: OwnerEntity(
+            id: 0, name: 'name', phone: 'phone', address: Address()),
+        types: TypesOfBoat.yacht,
+        identityNumber: IdentityNumber.cin,
+        cnp: CategoriesCNP.c,
+        isAvailable: false)));
+
 final typesOfBoatNotifierProvider =
     StateNotifierProvider<TypesOfBoatNotifier, List<TypesOfBoat>>(
         (_) => TypesOfBoatNotifier(TypesOfBoat.values));
+
+final categoriesCnpNotifierProvider =
+    StateNotifierProvider<CategoryCnpNotifier, List<CategoriesCNP>>(
+        (_) => CategoryCnpNotifier(CategoriesCNP.values));
+
+final ownerEntityNotifierProvider =
+    StateNotifierProvider<OwnerEntityNotifier, OwnerEntity>((ref) =>
+        OwnerEntityNotifier(const OwnerEntity(
+            id: 0,
+            name: 'ownerName',
+            phone: 'ownerPhone',
+            address: Address())));
+
+final addressNotifierProvider = StateNotifierProvider<AddressNotifier, Address>(
+    (_) => AddressNotifier(const Address(
+        city: 'city',
+        street: 'street',
+        suite: 'suite',
+        zipcode: 'zipCode',
+        geo: Geo())));
+
+final identityNumberNotifierProvider =
+    StateNotifierProvider<IdentityNumberNotifier, List<IdentityNumber>>(
+        (_) => IdentityNumberNotifier(IdentityNumber.values));
+
+final geoNotifierProvider = StateNotifierProvider<GeoNotifier, Geo>(
+    (_) => GeoNotifier(const Geo(lat: 0.0, lng: 0.0)));

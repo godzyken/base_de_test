@@ -18,7 +18,7 @@ class BoatLocationFormViewModel {
   var _isAvailable = false;
   var _types = TypesOfBoat.values;
   var cnp = CategoriesCNP.values;
-  final DateTime _initDate = DateTime(DateTime.now().year);
+  final DateTime _initDate = DateTime.now();
   final DateTime _minimal = DateTime(DateTime.now().year);
   final DateTime _maximal = DateTime(DateTime.now().year + 5);
   final DateTimeRange _initDateTimeRange = DateTimeRange(

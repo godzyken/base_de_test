@@ -84,6 +84,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildFormWidget(),
+          _buildIdentityNumberOfBoatFormWidget(),
+          _buildTypesOfBoatFormWidget(),
           _buildCategoryOfBoatFormWidget(),
           _buildSaveButtonWidget(),
         ],
@@ -131,7 +133,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       validator: (_) => _formViewModel.validateName(),
       decoration: const InputDecoration(
         icon: Icon(Icons.edit),
-        labelText: 'Client Name',
+        labelText: 'Boat Name',
         helperText: 'Required',
         border: OutlineInputBorder(),
       ),
@@ -152,7 +154,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     );
   }
 
-  Widget _buildCategoryOfBoatFormWidget() {
+  Widget _buildTypesOfBoatFormWidget() {
     final newTypes = ref.watch(typesOfBoatNotifierProvider);
     log('${newTypes.length}');
     return Container(
@@ -180,63 +182,77 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     );
   }
 
-  Widget _buildLocDateFormWidget() {
-    var start = DateTime.now();
-    var end = DateTime.now();
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          child: TextFormField(
-            focusNode: _rentalDateFormFocusNode,
-            controller: _textEditingController,
-            maxLength: 70,
-            onTap: () => _showDateRangePicker(context),
-            onChanged: (value) {
-              start = DateTime.parse(value);
-              setState(() {
-                _textEditingController.text =
-                    _formViewModel.setStartLocation(start);
-              });
-            },
-            validator: (_) => _formViewModel.validateDateInset(),
-            decoration: const InputDecoration(
-              icon: Icon(Icons.calendar_today_rounded),
-              labelText: 'rental date',
-              helperText: 'Required',
-              border: OutlineInputBorder(),
-            ),
+  Widget _buildCategoryOfBoatFormWidget() {
+    final newCat = ref.watch(categoriesCnpNotifierProvider);
+    log('${newCat.length}');
+    return Container(
+      padding: const EdgeInsets.all(8),
+      width: MediaQuery.of(context).size.width,
+      height: 60,
+      decoration: const BoxDecoration(
+          color: Colors.cyanAccent,
+          borderRadius: BorderRadius.all(Radius.circular(3.0))),
+      child: ListView.builder(
+        itemCount: newCat.length,
+        itemBuilder: (context, index) => ListTile(
+          selected: true,
+          leading: const Icon(
+            Icons.category_sharp,
+            color: Colors.cyan,
+          ),
+          onTap: () {},
+          title: Text(
+            newCat[index].name,
+            style: context.textTheme.titleMedium,
           ),
         ),
-        /*       const SizedBox(
-          width: 12,
-        ),
-        Expanded(
-          child: TextFormField(
-            focusNode: _returnDateFormFocusNode,
-            controller: _textEditingController,
-            maxLength: 20,
-            onTap: () => _showDateRangePicker(context),
-            onChanged: (value) {
-              end = DateTime.parse(value);
-              setState(() {
-                _textEditingController.text =
-                    _formViewModel.setStopLocation(end);
-              });
-            },
-            validator: (_) => _formViewModel.validateDateOffset(),
-            decoration: const InputDecoration(
-              labelText: 'return date',
-              helperText: 'Required',
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ),*/
-      ],
+      ),
     );
-    /*return TextFormField(
+  }
 
-    );*/
+  Widget _buildIdentityNumberOfBoatFormWidget() {
+    final newIdentity = ref.watch(identityNumberNotifierProvider);
+    log('${newIdentity.length}');
+    return Container(
+      padding: const EdgeInsets.all(8),
+      width: MediaQuery.of(context).size.width,
+      height: 60,
+      decoration: const BoxDecoration(
+          color: Colors.cyanAccent,
+          borderRadius: BorderRadius.all(Radius.circular(3.0))),
+      child: ListView.builder(
+        itemCount: newIdentity.length,
+        itemBuilder: (context, index) => ListTile(
+          selected: true,
+          leading: const Icon(
+            Icons.perm_identity_sharp,
+            color: Colors.cyan,
+          ),
+          onTap: () {},
+          title: Text(
+            newIdentity[index].name,
+            style: context.textTheme.titleMedium,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocDateFormWidget() {
+    return TextFormField(
+      focusNode: _rentalDateFormFocusNode,
+      controller: _textEditingController,
+      maxLength: 70,
+      onTap: () => _showDatePicker(context),
+      onChanged: (value) => _formViewModel.createOrUpdateBoat(),
+      validator: (_) => _formViewModel.validateDateInset(),
+      decoration: const InputDecoration(
+        icon: Icon(Icons.calendar_today_rounded),
+        labelText: 'created date',
+        helperText: 'Required',
+        border: OutlineInputBorder(),
+      ),
+    );
   }
 
   Widget _buildDeleteBoatIconWidget() {
@@ -246,22 +262,18 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     );
   }
 
-  Future<DateTimeRange?> _showDateRangePicker(
-      final BuildContext context) async {
-    final DateTimeRange? selectedDate = await showDateRangePicker(
+  Future<DateTime?> _showDatePicker(final BuildContext context) async {
+    final DateTime? selectedDate = await showDatePicker(
         context: context,
-        initialDateRange: _formViewModel.initDateRangeValue(),
+        initialDate: _formViewModel.initialLocDateValue(),
         currentDate: _formViewModel.initialLocDateValue(),
         firstDate: _formViewModel.datePickerFirstDate(),
         lastDate: _formViewModel.datePickerLastDate(),
         initialEntryMode: DatePickerEntryMode.calendar,
-        saveText: 'Done');
+        confirmText: 'Done');
     if (selectedDate != null) {
       _textEditingController.text =
-          DateFormat('dd/MM/yyyy').format(selectedDate.start);
-      _formViewModel.setStartLocation(selectedDate.start);
-      _formViewModel.setStopLocation(selectedDate.end);
-
+          DateFormat('dd/MM/yyyy').format(selectedDate);
       setState(() => selectedDate);
     }
     return null;
