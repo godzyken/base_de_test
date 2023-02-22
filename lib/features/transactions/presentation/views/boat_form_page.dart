@@ -4,6 +4,7 @@ import 'package:base_de_test/features/common/presentation/utils/extensions/ui_ex
 import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
 import 'package:base_de_test/features/transactions/presentation/controller/boat_notifier.dart';
 import 'package:base_de_test/features/transactions/presentation/viewmodel/boatform/boat_form_viewmodel.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -205,6 +206,9 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
           color: Colors.cyanAccent,
           borderRadius: BorderRadius.all(Radius.circular(3.0))),
       child: ListView.builder(
+        dragStartBehavior: DragStartBehavior.start,
+        controller:
+            ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true),
         itemCount: newCat.length,
         itemBuilder: (context, index) => ListTile(
           selected: true,
@@ -229,16 +233,18 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       padding: const EdgeInsets.all(4),
       width: 60,
       height: 60,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
           color: Colors.cyanAccent,
-          borderRadius: BorderRadius.all(Radius.circular(3.0))),
+          border: Border.all(color: Colors.black38),
+          borderRadius: const BorderRadius.all(Radius.circular(3.0))),
       child: ListView.builder(
+        shrinkWrap: true,
         itemCount: newIdentity.length,
         itemBuilder: (context, index) => ListTile(
           selected: true,
           leading: const Icon(
             Icons.perm_identity_sharp,
-            color: Colors.cyan,
+            color: Colors.black45,
           ),
           onTap: () {},
           title: Text(
@@ -299,7 +305,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     if (selectedDate != null) {
       _textEditingController.text =
           DateFormat('dd/MM/yyyy').format(selectedDate);
-      setState(() => _onChangedAvailableValue(selectedDate, true));
+      _onChangedAvailableValue(selectedDate, true);
     }
     return null;
   }

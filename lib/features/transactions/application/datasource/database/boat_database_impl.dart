@@ -15,6 +15,8 @@ class BoatDatabaseImpl implements SourceBase {
   static const _columnCategoryCnp = 'cnp';
   static const _columnOwner = 'owner';
   static const _columnAvailable = 'available';
+  static const _columnCreatedAt = 'create_date';
+  static const _columnDeletedAt = 'deleted_date';
   static const _columnRentedAt = 'rent_date';
   static const _columnReturnAt = 'return_date';
   static const _columnRole = 'return_role';
@@ -92,6 +94,8 @@ class BoatDatabaseImpl implements SourceBase {
               $_columnAvailable BOOLEAN NOT NULL,
               $_columnIdentityNumber TEXT NOT NULL,
               $_columnCategoryCnp TEXT NOT NULL,
+              $_columnCreatedAt INTEGER NOT NULL,
+              $_columnDeletedAt INTEGER NOT NULL,
               $_columnRentedAt INTEGER NOT NULL,
               $_columnReturnAt INTEGER NOT NULL,
               $_columnRole TEXT NOT NULL
