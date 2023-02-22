@@ -56,10 +56,6 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     ref.read(boatNotifierProvider.notifier).updateName(value);
   }*/
 
-  /*  void onChangedAvailableValue(String value) {
-    ref.read(boatNotifierProvider.notifier).updateName(value);
-  }*/
-
   /*  void onChangedTypesOfBoat(String value) {
     ref.read(boatNotifierProvider.notifier).updateName(value);
   }*/
@@ -84,9 +80,6 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildFormWidget(),
-          _buildIdentityNumberOfBoatFormWidget(),
-          _buildTypesOfBoatFormWidget(),
-          _buildCategoryOfBoatFormWidget(),
           _buildSaveButtonWidget(),
         ],
       ),
@@ -119,6 +112,25 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
           _buildOwnerNameFormWidget(),
           const SizedBox(height: 16),
           _buildLocDateFormWidget(),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: _buildIdentityNumberOfBoatFormWidget(),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                flex: 2,
+                child: _buildTypesOfBoatFormWidget(),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                flex: 1,
+                child: _buildCategoryOfBoatFormWidget(),
+              )
+            ],
+          ),
         ],
       ),
     );
@@ -158,8 +170,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     final newTypes = ref.watch(typesOfBoatNotifierProvider);
     log('${newTypes.length}');
     return Container(
-      padding: const EdgeInsets.all(8),
-      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.all(4),
+      width: 60,
       height: 60,
       decoration: const BoxDecoration(
           color: Colors.cyanAccent,
@@ -186,8 +198,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     final newCat = ref.watch(categoriesCnpNotifierProvider);
     log('${newCat.length}');
     return Container(
-      padding: const EdgeInsets.all(8),
-      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.all(4),
+      width: 60,
       height: 60,
       decoration: const BoxDecoration(
           color: Colors.cyanAccent,
@@ -214,8 +226,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     final newIdentity = ref.watch(identityNumberNotifierProvider);
     log('${newIdentity.length}');
     return Container(
-      padding: const EdgeInsets.all(8),
-      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.all(4),
+      width: 60,
       height: 60,
       decoration: const BoxDecoration(
           color: Colors.cyanAccent,
@@ -262,6 +274,18 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     );
   }
 
+  Future<bool?> _onChangedAvailableValue(final DateTime d, bool value) async {
+    if (d.isUtc) {
+      value = true;
+      ref.read(boatNotifierProvider.notifier).updateIsAvailableValue(value);
+      return boat.isAvailable;
+    } else {
+      value = false;
+      ref.read(boatNotifierProvider.notifier).updateIsAvailableValue(value);
+      return boat.isAvailable;
+    }
+  }
+
   Future<DateTime?> _showDatePicker(final BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
         context: context,
@@ -270,11 +294,12 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         firstDate: _formViewModel.datePickerFirstDate(),
         lastDate: _formViewModel.datePickerLastDate(),
         initialEntryMode: DatePickerEntryMode.calendar,
+        initialDatePickerMode: DatePickerMode.day,
         confirmText: 'Done');
     if (selectedDate != null) {
       _textEditingController.text =
           DateFormat('dd/MM/yyyy').format(selectedDate);
-      setState(() => selectedDate);
+      setState(() => _onChangedAvailableValue(selectedDate, true));
     }
     return null;
   }
@@ -293,8 +318,6 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     return null;
   }
 */
-
-  Future pickDateTime(final BuildContext? context) async {}
 
   _showConfirmDeleteBoatLocationDialog() async {
     final bool result = await showDialog(

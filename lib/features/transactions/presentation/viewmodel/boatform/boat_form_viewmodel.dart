@@ -19,6 +19,7 @@ class BoatLocationFormViewModel {
   var _types = TypesOfBoat.values;
   var cnp = CategoriesCNP.values;
   final DateTime _initDate = DateTime.now();
+  final DateTime _removeDate = DateTime.now();
   final DateTime _minimal = DateTime(DateTime.now().year);
   final DateTime _maximal = DateTime(DateTime.now().year + 5);
   final DateTimeRange _initDateTimeRange = DateTimeRange(
@@ -51,6 +52,9 @@ class BoatLocationFormViewModel {
         _types.single,
         cnp.single,
         _initDate,
+        _removeDate,
+        _initDateTimeRange.start,
+        _initDateTimeRange.end,
         _raison,
       );
     } else {
@@ -62,8 +66,7 @@ class BoatLocationFormViewModel {
           identityNumber: _boatIdentity.single,
           cnp: cnp.single,
           isAvailable: _isAvailable,
-          rentedAt: _initDateTimeRange.start,
-          returnedAt: _initDateTimeRange.end,
+          createdAt: _initDate,
           role: _raison);
 
       _boatListViewModel.updateBoat(newBoat);
@@ -107,6 +110,14 @@ class BoatLocationFormViewModel {
   setCategoryCnp(final List<CategoriesCNP> value) => cnp = value;
   setStartLocation(final DateTime value) => _initDateTimeRange.start;
   setStopLocation(final DateTime value) => _initDateTimeRange.end;
+
+  even(final DateTimeRange dateTimeRange, initialAvailableValue) {
+    if (setStartLocation(dateTimeRange.start)) {
+      initialAvailableValue = false;
+    } else if (setStopLocation(dateTimeRange.end)) {
+      initialAvailableValue = true;
+    }
+  }
 
   String? validateName() {
     if (_name.isEmpty) {

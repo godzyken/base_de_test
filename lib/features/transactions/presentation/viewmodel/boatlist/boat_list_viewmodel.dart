@@ -46,11 +46,24 @@ class BoatListViewModel extends StateNotifier<State<BoatList>> {
     final TypesOfBoat typesOfBoat,
     final CategoriesCNP cnp,
     final DateTime create,
+    final DateTime? removedAt,
+    final DateTime? rentAt,
+    final DateTime? returnedAt,
     final String role,
   ) async {
     try {
-      final newBoat = await _createBoatLocationCase.execute(name, ownerEntity,
-          identityNumber, typesOfBoat, cnp, isAvailable, create, role);
+      final newBoat = await _createBoatLocationCase.execute(
+          name,
+          ownerEntity,
+          identityNumber,
+          typesOfBoat,
+          cnp,
+          isAvailable,
+          create,
+          removedAt!,
+          rentAt!,
+          returnedAt!,
+          role);
 
       state = State.success(state.data!.addBoat(newBoat));
     } on Exception catch (e) {
@@ -68,8 +81,10 @@ class BoatListViewModel extends StateNotifier<State<BoatList>> {
           newBoat.types,
           newBoat.cnp,
           newBoat.isAvailable,
-          newBoat.returnedAt!,
+          newBoat.createdAt,
+          newBoat.deletedAt!,
           newBoat.rentedAt!,
+          newBoat.returnedAt!,
           newBoat.role!);
       state = State.success(state.data!.updateBoat(newBoat));
     } on Exception catch (e) {

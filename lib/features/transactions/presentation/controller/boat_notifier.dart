@@ -27,6 +27,10 @@ class BoatNotifier extends StateNotifier<Boat> {
   void updateCategory(CategoriesCNP cnp) {
     state = state.copyWith(cnp: cnp);
   }
+
+  void updateIsAvailableValue(bool b) {
+    state = state.copyWith(isAvailable: b);
+  }
 }
 
 class TypesOfBoatNotifier extends StateNotifier<List<TypesOfBoat>> {
@@ -153,14 +157,15 @@ class IdentityNumberNotifier extends StateNotifier<List<IdentityNumber>> {
 
 // providers
 final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) =>
-    BoatNotifier(const Boat(
-        boatId: BoatId(value: 0),
+    BoatNotifier(Boat(
+        boatId: const BoatId(value: 0),
         name: 'name',
-        ownerEntity: OwnerEntity(
+        ownerEntity: const OwnerEntity(
             id: 0, name: 'name', phone: 'phone', address: Address()),
         types: TypesOfBoat.yacht,
         identityNumber: IdentityNumber.cin,
         cnp: CategoriesCNP.c,
+        createdAt: DateTime.now(),
         isAvailable: false)));
 
 final typesOfBoatNotifierProvider =

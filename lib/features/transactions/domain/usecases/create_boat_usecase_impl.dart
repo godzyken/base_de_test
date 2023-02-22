@@ -17,6 +17,9 @@ class CreateBoatLocationCaseImpl implements CreateBoatLocationCase {
     final CategoriesCNP cnp,
     final bool isAvailable,
     final DateTime create,
+    final DateTime? deletedAt,
+    final DateTime? rentedAt,
+    final DateTime? returnedAt,
     final String role,
   ) {
     return _repository.createBoat(
@@ -27,6 +30,9 @@ class CreateBoatLocationCaseImpl implements CreateBoatLocationCase {
       cnp,
       isAvailable,
       create,
+      deletedAt!,
+      rentedAt!,
+      returnedAt,
       role,
     );
   }

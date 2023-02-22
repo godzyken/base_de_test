@@ -9,6 +9,9 @@ abstract class CreateBoatLocationCase {
     final CategoriesCNP cnp,
     final bool isAvailable,
     final DateTime create,
+    final DateTime? deletedAt,
+    final DateTime? rentedAt,
+    final DateTime? returnedAt,
     final String role,
   );
 }

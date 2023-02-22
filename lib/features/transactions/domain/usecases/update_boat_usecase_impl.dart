@@ -17,8 +17,10 @@ class UpdateBoatLocationUseCaseImpl implements UpdateBoatLocationUseCase {
     final TypesOfBoat types,
     final CategoriesCNP cnp,
     final bool isAvailable,
-    final DateTime onDispose,
-    final DateTime unDispose,
+    final DateTime createdAt,
+    final DateTime? deletedAt,
+    final DateTime? rentedAt,
+    final DateTime? returnedAt,
     final String role,
   ) {
     return _repository.updateBoat(
@@ -29,8 +31,10 @@ class UpdateBoatLocationUseCaseImpl implements UpdateBoatLocationUseCase {
       identityNumber,
       cnp,
       isAvailable,
-      onDispose,
-      unDispose,
+      createdAt,
+      deletedAt!,
+      returnedAt!,
+      returnedAt,
       role,
     );
   }

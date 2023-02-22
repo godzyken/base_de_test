@@ -19,11 +19,25 @@ class BoatsRepositoryImpl implements BoatsRepository {
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
       final bool isAvailable,
-      final DateTime? createdAt,
+      final DateTime createdAt,
+      final DateTime? deletedAt,
+      final DateTime? rentedAt,
+      final DateTime? returnedAt,
       final String? role) async {
-    final boatEntity = await database.insertBoat(
-        BoatMapper.transformToNewEntityMap(name, owner, cnp, identityNumber,
-            isAvailable, createdAt!, types, role!));
+    final boatEntity =
+        await database.insertBoat(BoatMapper.transformToNewEntityMap(
+      name,
+      owner,
+      cnp,
+      identityNumber,
+      isAvailable,
+      createdAt,
+      deletedAt!,
+      rentedAt!,
+      returnedAt!,
+      types,
+      role!,
+    ));
     return BoatMapper.transformToModel(boatEntity);
   }
 
@@ -47,20 +61,25 @@ class BoatsRepositoryImpl implements BoatsRepository {
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
       final bool isAvailable,
-      final DateTime? createdAt,
-      final DateTime? removedAt,
+      final DateTime createdAt,
+      final DateTime? deletedAt,
+      final DateTime? rentedAt,
+      final DateTime? returnedAt,
       final String? role) async {
     final boat = Boat(
-        boatId: id,
-        name: name,
-        ownerEntity: owner,
-        types: types,
-        identityNumber: identityNumber,
-        cnp: cnp,
-        isAvailable: isAvailable,
-        rentedAt: createdAt,
-        returnedAt: removedAt,
-        role: role);
+      boatId: id,
+      name: name,
+      ownerEntity: owner,
+      types: types,
+      identityNumber: identityNumber,
+      cnp: cnp,
+      isAvailable: isAvailable,
+      createdAt: createdAt,
+      deletedAt: deletedAt!,
+      rentedAt: rentedAt!,
+      returnedAt: returnedAt!,
+      role: role,
+    );
 
     await database.updateBoat(BoatMapper.transformToMap(boat));
   }

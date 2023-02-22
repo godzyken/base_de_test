@@ -12,6 +12,8 @@ class BoatMapper {
         identityNumber: entity['matriculation'],
         cnp: entity['cnp'],
         isAvailable: entity['is_available'] == 1,
+        createdAt: DateTime.parse(entity['created_at']),
+        deletedAt: DateTime.parse(entity['deleted_at']),
         rentedAt: DateTime.parse(entity['rent_date']),
         returnedAt: DateTime.parse(entity['return_date']),
         role: entity['role']);
@@ -26,6 +28,8 @@ class BoatMapper {
       'cnp': model.cnp,
       'identity_number': model.identityNumber,
       'is_available': model.isAvailable ? 1 : 0,
+      'created_at': model.createdAt.toIso8601String(),
+      'deleted_at': model.deletedAt?.toIso8601String(),
       'rented_at': model.rentedAt?.toIso8601String(),
       'returned_at': model.returnedAt?.toIso8601String(),
       'role': model.role,
@@ -38,7 +42,10 @@ class BoatMapper {
       final CategoriesCNP cnp,
       final IdentityNumber identityNumber,
       final bool isAvailable,
-      final DateTime rentedAt,
+      final DateTime createdAt,
+      final DateTime? deletedAt,
+      final DateTime? rentedAt,
+      final DateTime? returnedAt,
       final TypesOfBoat typesOfBoat,
       final String role) {
     return {
@@ -49,7 +56,10 @@ class BoatMapper {
       'cnp': cnp,
       'identity_number': identityNumber,
       'is_available': isAvailable ? 1 : 0,
-      'rented_at': rentedAt.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'deleted_at': deletedAt?.toIso8601String(),
+      'rented_at': rentedAt?.toIso8601String(),
+      'returned_at': returnedAt?.toIso8601String(),
       'role': role,
     };
   }
