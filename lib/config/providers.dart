@@ -35,5 +35,7 @@ Future<void> initializeProvider(ProviderContainer container) async {
   await container.read(sharedPreferencesProvider.future);
   await container.read(supabaseProvider.future);
 
+  container.read(databaseProvider);
+
   container.read(authControllerProvider);
 }

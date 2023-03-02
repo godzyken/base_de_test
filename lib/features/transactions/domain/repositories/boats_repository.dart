@@ -4,6 +4,7 @@ import '../entities/boat/boat_entity.dart';
 import '../entities/boat/boat_list_entity.dart';
 
 abstract class BoatsRepository {
+  Stream<List<BoatList>> streamAllBoats();
   Future<BoatList> getBoatList();
   Future<Boat> createBoat(
       final String name,

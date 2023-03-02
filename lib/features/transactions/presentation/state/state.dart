@@ -1,3 +1,4 @@
+import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'state.freezed.dart';
@@ -20,4 +21,11 @@ class State<T> with _$State<T> {
   bool get isError => maybeWhen(error: (_) => true, orElse: () => false);
 
   T? get data => maybeWhen(success: (data) => data, orElse: () => null);
+
+  List<T>? get dataStream => mapOrNull(
+        success: (_) => []..breakI((t) => isSuccess),
+        loading: (value) => []..lastOption.pure(data),
+        error: (value) => []..all((t) => false),
+        init: (value) => []..init,
+      );
 }

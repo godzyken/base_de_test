@@ -10,4 +10,7 @@ class GetBoatListUseCaseImpl implements GetBoatListUseCase {
 
   @override
   Future<BoatList> execute() => _repository.getBoatList();
+
+  @override
+  Stream<List<BoatList>> streamBoats() => _repository.streamAllBoats();
 }

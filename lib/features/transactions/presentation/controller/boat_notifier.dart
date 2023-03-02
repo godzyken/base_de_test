@@ -4,32 +4,48 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class BoatNotifier extends StateNotifier<Boat> {
   BoatNotifier(super.state);
 
-  void updateId(BoatId i) {
-    state = state.copyWith(boatId: i);
+  void updateId(int id) {
+    state = state.copyWith.boatId!(value: id);
   }
 
   void updateName(String n) {
     state = state.copyWith(name: n);
   }
 
-  void updateOwnerEntity(OwnerEntity o) {
-    state = state.copyWith(ownerEntity: o);
+  void updateOwnerName(String o) {
+    state = state.copyWith.ownerEntity(name: o);
   }
 
-  void updateTypes(TypesOfBoat t) {
-    state = state.copyWith(types: t);
+  void updateCreatedDate(String d) {
+    state = state.copyWith(createdAt: DateTime.parse(d));
   }
 
-  void updateIdentityNumber(IdentityNumber nb) {
-    state = state.copyWith(identityNumber: nb);
+  void updateRentalDate(String d) {
+    state = state.copyWith(rentedAt: DateTime.parse(d));
   }
 
-  void updateCategory(CategoriesCNP cnp) {
-    state = state.copyWith(cnp: cnp);
+  void updateReturnedDate(String d) {
+    state = state.copyWith(returnedAt: DateTime.parse(d));
+  }
+
+  void setRemovedDate(String r) {
+    state = state.copyWith(deletedAt: DateTime.parse(r));
+  }
+
+  void updateTypes(String t) {
+    state = state.copyWith(types: TypesOfBoat.values.byName(t));
+  }
+
+  void updateIdentityNumber(String nb) {
+    state = state.copyWith(identityNumber: IdentityNumber.values.byName(nb));
+  }
+
+  void updateCategory(String cnp) {
+    state = state.copyWith(cnp: CategoriesCNP.values.byName(cnp));
   }
 
   void updateIsAvailableValue(bool b) {
-    state = state.copyWith(isAvailable: b);
+    state = state.copyWith(isAvailable: b, isChecked: b);
   }
 }
 
@@ -152,6 +168,34 @@ class IdentityNumberNotifier extends StateNotifier<List<IdentityNumber>> {
         number = IdentityNumber.win;
         return number.name;
     }
+  }
+}
+
+class BoatFormProvider extends StateNotifier<FormBoatAddState> {
+  BoatFormProvider() : super(FormBoatAddState(Boat.empty()));
+
+  void addBoat(Boat b) {
+    Boat form = state.form.copyWith(
+      boatId: b.boatId,
+      ownerEntity: b.ownerEntity,
+      name: b.name,
+      identityNumber: b.identityNumber,
+      createdAt: b.createdAt,
+      types: b.types,
+      rentedAt: b.rentedAt,
+      cnp: b.cnp,
+      role: b.role,
+    );
+
+    late Boat boat;
+
+    if (form.isAvailable) {
+      boat = form.copyWith(isAvailable: true);
+    } else {
+      boat = form.copyWith(isAvailable: false);
+    }
+
+    state = state.copyWith(form: form.copyWith(boatId: boat.boatId));
   }
 }
 

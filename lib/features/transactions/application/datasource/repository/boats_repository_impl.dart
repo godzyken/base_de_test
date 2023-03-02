@@ -83,4 +83,10 @@ class BoatsRepositoryImpl implements BoatsRepository {
 
     await database.updateBoat(BoatMapper.transformToMap(boat));
   }
+
+  @override
+  Stream<List<BoatList>> streamAllBoats() {
+    // TODO: implement streamAllBoats
+    throw UnimplementedError();
+  }
 }

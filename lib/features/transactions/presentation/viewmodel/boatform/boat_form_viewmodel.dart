@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/entities/entities.dart';
 
-class BoatLocationFormViewModel {
-  BoatLocationFormViewModel(final Boat? boat, this._boatListViewModel) {
+class AddBoatFormViewModel {
+  AddBoatFormViewModel(final Boat? boat, this._boatListViewModel) {
     _initBoat(boat);
   }
   late BoatId _id;
@@ -88,7 +88,7 @@ class BoatLocationFormViewModel {
   bool initialAvailableValue() => _isAvailable;
   List<TypesOfBoat> initialTypesOfBoatValue() => _types;
   List<CategoriesCNP> initialCnpValue() => cnp;
-  DateTime initialLocDateValue() => _initDate;
+  DateTime initialCreatedDateValue() => _initDate;
   DateTime datePickerFirstDate() => _minimal;
   DateTime datePickerLastDate() => _maximal;
   String initialRoleValue() => _raison;
@@ -97,15 +97,16 @@ class BoatLocationFormViewModel {
 
   setName(final String value) => _name = value;
   setRole(final String value) => _raison = value;
-  setOwnerName(final String value) {
-    _ownerName = value;
-    var address = const Address();
-    _owner =
-        OwnerEntity(id: 0, name: _ownerName, phone: 'phone', address: address);
-  }
+  setOwnerName(final String value) => _owner.copyWith(name: value).name;
 
   setBoatIdentity(final List<IdentityNumber> value) => _boatIdentity = value;
-  setTypesBoat(final List<TypesOfBoat> value) => _types = value;
+  setTypesBoat(final List<TypesOfBoat> value) {
+    if (_types.isNotEmpty) {
+      _types.contains(value.single);
+      return value;
+    }
+  }
+
   setIsAvailable(final bool value) => _isAvailable = value;
   setCategoryCnp(final List<CategoriesCNP> value) => cnp = value;
   setStartLocation(final DateTime value) => _initDateTimeRange.start;
@@ -119,10 +120,12 @@ class BoatLocationFormViewModel {
     }
   }
 
-  String? validateName() {
-    if (_name.isEmpty) {
+  String? validateName(value) {
+    _name = value;
+    _ownerName = value;
+    if (_name.isEmpty || _ownerName.isNotEmpty) {
       return 'Enter a name';
-    } else if (_name.length > 20) {
+    } else if (_name.length > 20 || _ownerName.length > 20) {
       return 'Limit the name to 20 characters';
     } else {
       return null;
@@ -131,8 +134,10 @@ class BoatLocationFormViewModel {
 
   String? validateDateInset() {
     if (_isNewBoat && _initDateTimeRange.start.isBefore(_initDate)) {
+      setIsAvailable(true);
       return 'Start date of location must be after today\'s date';
     } else {
+      setIsAvailable(false);
       return null;
     }
   }
@@ -153,8 +158,28 @@ class BoatLocationFormViewModel {
 }
 
 final boatFormViewModelProvider =
-    Provider.autoDispose.family<BoatLocationFormViewModel, Boat?>((ref, boat) {
+    Provider.autoDispose.family<AddBoatFormViewModel, Boat?>((ref, boat) {
   final boatListViewModel =
       ref.watch(boatListViewModelStateNotifierProvider.notifier);
-  return BoatLocationFormViewModel(boat, boatListViewModel);
+  ref.keepAlive();
+  return AddBoatFormViewModel(boat, boatListViewModel);
+});
+
+final boatListFutureProvider = FutureProvider.autoDispose
+    .family<List<Boat>, AddBoatFormViewModel>((ref, filter) async {
+  final boatListViewModel =
+      ref.watch(boatListViewModelStateNotifierProvider.notifier);
+
+  return boatListViewModel.addBoatLocation(
+      filter._name,
+      filter._isAvailable,
+      filter._owner,
+      filter._boatIdentity.single,
+      filter._types.single,
+      filter.cnp.single,
+      filter._initDate,
+      filter._removeDate,
+      filter._initDateTimeRange.start,
+      filter._initDateTimeRange.end,
+      filter._raison);
 });

@@ -113,7 +113,6 @@ class BoatDatabaseImpl implements SourceBase {
   @override
   Future close() async {
     final db = await database;
-
     db.close();
   }
 }

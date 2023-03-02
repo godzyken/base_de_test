@@ -86,7 +86,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           builder: (context, state) => BoatListPage(),
           routes: [
             GoRoute(
-              path: 'add-location',
+              path: 'add-boat',
               name: AppRoute.boatFormPage.name,
               builder: (context, state) => BoatFormPage(boat),
             ),
