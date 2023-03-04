@@ -26,7 +26,7 @@ Future<ProviderContainer> bootstrap() async {
 
 class _Logger extends ProviderObserver {
   @override
-  void didUpdateProvider(ProviderBase<dynamic> provider, Object? previousValue,
+  void didUpdateProvider(ProviderBase<Object?> provider, Object? previousValue,
       Object? newValue, ProviderContainer container) {
     debugPrint('''{
       "provider": "${provider.name ?? provider.runtimeType}",

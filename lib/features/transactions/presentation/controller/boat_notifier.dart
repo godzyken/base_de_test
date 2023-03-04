@@ -171,21 +171,24 @@ class IdentityNumberNotifier extends StateNotifier<List<IdentityNumber>> {
   }
 }
 
-class BoatFormProvider extends StateNotifier<FormBoatAddState> {
-  BoatFormProvider() : super(FormBoatAddState(Boat.empty()));
+class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
+  BoatFormStateNotifier() : super(FormBoatAddState(Boat.empty()));
 
-  void addBoat(Boat b) {
+  void addBoat(Boat b) async {
     Boat form = state.form.copyWith(
-      boatId: b.boatId,
-      ownerEntity: b.ownerEntity,
-      name: b.name,
-      identityNumber: b.identityNumber,
-      createdAt: b.createdAt,
-      types: b.types,
-      rentedAt: b.rentedAt,
-      cnp: b.cnp,
-      role: b.role,
-    );
+        boatId: b.boatId,
+        ownerEntity: b.ownerEntity,
+        name: b.name,
+        identityNumber: b.identityNumber,
+        createdAt: b.createdAt,
+        types: b.types,
+        rentedAt: b.rentedAt,
+        cnp: b.cnp,
+        role: b.role,
+        isAvailable: b.isAvailable,
+        returnedAt: b.returnedAt,
+        isChecked: b.isChecked,
+        deletedAt: b.deletedAt);
 
     late Boat boat;
 
@@ -242,3 +245,13 @@ final identityNumberNotifierProvider =
 
 final geoNotifierProvider = StateNotifierProvider<GeoNotifier, Geo>(
     (_) => GeoNotifier(const Geo(lat: 0.0, lng: 0.0)));
+
+final boatFormStateNotifierProvider =
+    StateNotifierProvider<BoatFormStateNotifier, FormBoatAddState>((ref) {
+  final form = ref.notifier;
+  final boatNotifier = ref.refresh(boatNotifierProvider.notifier);
+
+  form.addListener((state) {});
+
+  return form;
+});

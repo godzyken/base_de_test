@@ -48,9 +48,9 @@ class AddBoatFormViewModel {
         _name,
         _isAvailable,
         _owner,
-        _boatIdentity.single,
-        _types.single,
-        cnp.single,
+        _boatIdentity.first,
+        _types.first,
+        cnp.first,
         _initDate,
         _removeDate,
         _initDateTimeRange.start,
@@ -128,7 +128,7 @@ class AddBoatFormViewModel {
     } else if (_name.length > 20 || _ownerName.length > 20) {
       return 'Limit the name to 20 characters';
     } else {
-      return null;
+      return value;
     }
   }
 
@@ -174,9 +174,9 @@ final boatListFutureProvider = FutureProvider.autoDispose
       filter._name,
       filter._isAvailable,
       filter._owner,
-      filter._boatIdentity.single,
-      filter._types.single,
-      filter.cnp.single,
+      filter._boatIdentity.first,
+      filter._types.first,
+      filter.cnp.first,
       filter._initDate,
       filter._removeDate,
       filter._initDateTimeRange.start,

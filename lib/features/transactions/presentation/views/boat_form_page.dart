@@ -39,14 +39,15 @@ class BoatFormPage extends ConsumerStatefulWidget {
 
 class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   late final AddBoatFormViewModel _formViewModel;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final Boat boat;
+  late final GlobalKey<FormState> _formKey;
   final List<int> _selectedItems = [];
   final _rentalDateFormFocusNode = _DisabledFocusNode();
+
   late TextEditingController _dateTextEditingController;
   late TextEditingController _nameEditingController;
   late TextEditingController _ownerEditingController;
   late TextEditingController _roleTextController;
-  late final Boat boat;
 
   late ScrollController _selectIdentityNumberController;
   late ScrollController _selectCategoryCnpController;
@@ -58,16 +59,17 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   void initState() {
     super.initState();
     _formViewModel = ref.read(boatFormViewModelProvider(widget.boat));
-    log('message _formViewModel: $_formViewModel');
+    log('message _formViewModel: ${_formViewModel.createOrUpdateBoat()}');
+    boat = ref.watch(boatNotifierProvider);
+    log('boat on init: $boat');
+
     _nameEditingController = TextEditingController();
     _ownerEditingController = TextEditingController();
     _roleTextController = TextEditingController();
     _dateTextEditingController = TextEditingController(
         text: DateFormat('dd/MM/yyyy')
             .format(_formViewModel.initialCreatedDateValue()));
-    boat = ref.read(boatNotifierProvider);
-    log('boat on init: $boat');
-
+    _formKey = GlobalKey<FormState>(debugLabel: 'formKey: => ');
     _selectCategoryCnpController = ScrollController(
       keepScrollOffset: true,
       initialScrollOffset: 0.0,
@@ -83,6 +85,13 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   }
 
   @override
+  void didUpdateWidget(BoatFormPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    oldWidget.createElement();
+  }
+
+  @override
   void dispose() {
     _rentalDateFormFocusNode.dispose();
     _dateTextEditingController.dispose();
@@ -93,6 +102,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     _selectIdentityNumberController.dispose();
     _selectCategoryCnpController.dispose();
     _formViewModel.initialAvailableValue();
+
+    _formKey.currentState?.dispose();
 
     super.dispose();
   }
@@ -142,13 +153,16 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
   Widget _buildSaveButtonWidget() {
     return SizedBox(
+      key: ValueKey(_formKey),
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          if (_formKey.currentState?.validate() ?? false) {
-            log('currentState 1: ');
+          if (_formKey.currentState!.validate()) {
+            log('currentState 2: ');
+            _formViewModel.createOrUpdateBoat();
+            _getListPage();
           }
-          log('currentState 2: ');
+          log('currentState 1: ${_formKey.currentState}');
         },
         child: const Text('Save'),
       ),
@@ -156,37 +170,79 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   }
 
   Widget _buildFormWidget() {
-    return Form(
-      key: _formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      // onWillPop: onWillPop,
-      child: Column(
-        children: [
-          _buildBoatNameFormWidget(),
-          const SizedBox(height: 16),
-          _buildOwnerNameFormWidget(),
-          const SizedBox(height: 16),
-          _buildRentalDateFormWidget(),
-          const SizedBox(height: 16),
-          Row(
+    return Consumer(
+      builder: (BuildContext context, WidgetRef ref, Widget? child) {
+        ref.listen(boatNotifierProvider, (previous, next) {
+          boat.id != previous!.boatId!.value ? next : previous;
+        });
+        return Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          // onWillPop: onWillPop,
+          onChanged: () => _formKey.currentState!.validate(),
+          child: Column(
             children: [
-              Expanded(
-                flex: 1,
-                child: _buildIdentityNumberOfBoatFormWidget(),
+              _buildBoatNameFormWidget(),
+              const SizedBox(height: 16),
+              _buildOwnerNameFormWidget(),
+              const SizedBox(height: 16),
+              _buildRentalDateFormWidget(),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: _buildIdentityNumberOfBoatFormWidget(),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    flex: 2,
+                    child: _buildTypesOfBoatFormWidget(),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    flex: 1,
+                    child: _buildCategoryOfBoatFormWidget(),
+                  )
+                ],
               ),
-              const SizedBox(width: 4),
-              Expanded(
-                flex: 2,
-                child: _buildTypesOfBoatFormWidget(),
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                flex: 1,
-                child: _buildCategoryOfBoatFormWidget(),
-              )
             ],
           ),
-        ],
+        );
+      },
+      child: Form(
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        // onWillPop: onWillPop,
+        onChanged: () => _formKey.currentState!.validate(),
+        child: Column(
+          children: [
+            _buildBoatNameFormWidget(),
+            const SizedBox(height: 16),
+            _buildOwnerNameFormWidget(),
+            const SizedBox(height: 16),
+            _buildRentalDateFormWidget(),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: _buildIdentityNumberOfBoatFormWidget(),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  flex: 2,
+                  child: _buildTypesOfBoatFormWidget(),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  flex: 1,
+                  child: _buildCategoryOfBoatFormWidget(),
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
