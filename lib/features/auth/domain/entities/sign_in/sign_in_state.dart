@@ -25,8 +25,8 @@ class SignInState with _$SignInState {
       includeToJson: false,
     )
         PasswordFormz? passwordFormz,
-    @Default(FormzStatus.pure)
-        FormzStatus? status,
+    @Default(FormzSubmissionStatus.initial)
+        FormzSubmissionStatus? status,
     String? errorMessage,
   }) = _SignInState;
 

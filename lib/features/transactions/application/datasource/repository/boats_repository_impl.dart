@@ -1,9 +1,7 @@
 import 'package:base_de_test/features/transactions/application/datasource/database/source_base.dart';
 import 'package:base_de_test/features/transactions/application/datasource/mapper/boat_list_mapper.dart';
 import 'package:base_de_test/features/transactions/application/datasource/mapper/boat_mapper.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat/boat_id.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat/boat_list_entity.dart';
+import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
 import 'package:base_de_test/features/transactions/domain/repositories/boats_repository.dart';
 
 class BoatsRepositoryImpl implements BoatsRepository {
@@ -14,7 +12,9 @@ class BoatsRepositoryImpl implements BoatsRepository {
   @override
   Future<Boat> createBoat(
       final String name,
+      final OwnerId ownerId,
       final OwnerEntity owner,
+      final AddressEntity address,
       final TypesOfBoat types,
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
@@ -27,7 +27,9 @@ class BoatsRepositoryImpl implements BoatsRepository {
     final boatEntity =
         await database.insertBoat(BoatMapper.transformToNewEntityMap(
       name,
+      ownerId,
       owner,
+      address,
       cnp,
       identityNumber,
       isAvailable,
@@ -38,6 +40,7 @@ class BoatsRepositoryImpl implements BoatsRepository {
       types,
       role!,
     ));
+
     return BoatMapper.transformToModel(boatEntity);
   }
 
@@ -56,7 +59,9 @@ class BoatsRepositoryImpl implements BoatsRepository {
   Future<void> updateBoat(
       final BoatId id,
       final String name,
+      final OwnerId ownerId,
       final OwnerEntity owner,
+      final AddressEntity address,
       final TypesOfBoat types,
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
@@ -70,6 +75,7 @@ class BoatsRepositoryImpl implements BoatsRepository {
       boatId: id,
       name: name,
       ownerEntity: owner,
+      addressEntity: address,
       types: types,
       identityNumber: identityNumber,
       cnp: cnp,
@@ -79,6 +85,7 @@ class BoatsRepositoryImpl implements BoatsRepository {
       rentedAt: rentedAt!,
       returnedAt: returnedAt!,
       role: role,
+      ownerId: ownerId,
     );
 
     await database.updateBoat(BoatMapper.transformToMap(boat));
@@ -88,5 +95,10 @@ class BoatsRepositoryImpl implements BoatsRepository {
   Stream<List<BoatList>> streamAllBoats() {
     // TODO: implement streamAllBoats
     throw UnimplementedError();
+  }
+
+  @override
+  Future<void> closeDatabase() async {
+    await database.close();
   }
 }

@@ -1,14 +1,13 @@
-import 'package:base_de_test/features/transactions/domain/entities/boat/boat_id.dart';
-
-import '../entities/boat/boat_entity.dart';
-import '../entities/boat/boat_list_entity.dart';
+import '../entities/entities.dart';
 
 abstract class BoatsRepository {
   Stream<List<BoatList>> streamAllBoats();
   Future<BoatList> getBoatList();
   Future<Boat> createBoat(
       final String name,
+      final OwnerId ownerId,
       final OwnerEntity owner,
+      final AddressEntity address,
       final TypesOfBoat types,
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
@@ -21,7 +20,9 @@ abstract class BoatsRepository {
   Future<void> updateBoat(
       final BoatId id,
       final String name,
+      final OwnerId ownerId,
       final OwnerEntity owner,
+      final AddressEntity address,
       final TypesOfBoat types,
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
@@ -32,4 +33,5 @@ abstract class BoatsRepository {
       final DateTime? returnedAt,
       final String? role);
   Future<void> deleteBoat(final BoatId id);
+  Future<void> closeDatabase();
 }

@@ -24,8 +24,13 @@ class SignInWithPasswordController extends StateNotifier<SignInState> {
 
     state = state.copyWith(
       emailFormz: email,
-      status: Formz.validate([email, state.passwordFormz!]),
+      status: onStatus,
     );
+  }
+
+  FormzSubmissionStatus? get onStatus {
+    return FormzSubmissionStatus.values.fold(FormzSubmissionStatus.initial,
+        (previousValue, element) => previousValue ?? element);
   }
 
   void onPasswordChange(String value) {
@@ -33,21 +38,21 @@ class SignInWithPasswordController extends StateNotifier<SignInState> {
 
     state = state.copyWith(
       passwordFormz: password,
-      status: Formz.validate([state.emailFormz!, password]),
+      status: onStatus,
     );
   }
 
   Future<void> signInWithPassword() async {
-    state = state.copyWith(status: FormzStatus.submissionInProgress);
+    state = state.copyWith(status: FormzSubmissionStatus.inProgress);
 
     try {
       await _authRepository.signInWithPassword(
           state.emailFormz!.value, state.passwordFormz!.value);
 
-      state = state.copyWith(status: FormzStatus.submissionSuccess);
+      state = state.copyWith(status: FormzSubmissionStatus.success);
     } catch (e) {
       state = state.copyWith(
-          status: FormzStatus.submissionFailure, errorMessage: e.toString());
+          status: FormzSubmissionStatus.failure, errorMessage: e.toString());
     }
   }
 }

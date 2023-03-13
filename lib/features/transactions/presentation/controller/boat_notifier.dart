@@ -1,11 +1,14 @@
 import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
+import 'package:base_de_test/features/transactions/domain/repositories/boats_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:formz/formz.dart';
 
 class BoatNotifier extends StateNotifier<Boat> {
   BoatNotifier(super.state);
 
   void updateId(int id) {
-    state = state.copyWith.boatId!(value: id);
+    final count = id + 1 + DateTime.now().millisecondsSinceEpoch;
+    state = state.copyWith.boatId!(value: count);
   }
 
   void updateName(String n) {
@@ -13,7 +16,14 @@ class BoatNotifier extends StateNotifier<Boat> {
   }
 
   void updateOwnerName(String o) {
-    state = state.copyWith.ownerEntity(name: o);
+    state = state.copyWith.ownerEntity!(name: o);
+    int id = 2 + DateTime.now().millisecondsSinceEpoch;
+    state = state.copyWith.ownerId!(value: id);
+    state = state.copyWith.ownerEntity!.ownerId(value: id);
+  }
+
+  void updateRole(String r) {
+    state = state.copyWith(role: r);
   }
 
   void updateCreatedDate(String d) {
@@ -72,6 +82,9 @@ class TypesOfBoatNotifier extends StateNotifier<List<TypesOfBoat>> {
       case TypesOfBoat.yacht:
         typesOfBoat = TypesOfBoat.yacht;
         return typesOfBoat.name;
+      case TypesOfBoat.unknown:
+        typesOfBoat = TypesOfBoat.unknown;
+        return typesOfBoat.name;
     }
   }
 }
@@ -101,7 +114,8 @@ class OwnerEntityNotifier extends StateNotifier<OwnerEntity> {
   OwnerEntityNotifier(super.state);
 
   void updateOwnerId(int i) {
-    state = state.copyWith(id: i);
+    final count = i + 1 + DateTime.now().millisecondsSinceEpoch;
+    state = state.copyWith.ownerId(value: count);
   }
 
   void updateOwnerName(String n) {
@@ -111,13 +125,9 @@ class OwnerEntityNotifier extends StateNotifier<OwnerEntity> {
   void updateOwnerPhone(String p) {
     state = state.copyWith(phone: p);
   }
-
-  void updateOwnerAddress(Address? p) {
-    state = state.copyWith(address: p!);
-  }
 }
 
-class AddressNotifier extends StateNotifier<Address> {
+class AddressNotifier extends StateNotifier<AddressEntity> {
   AddressNotifier(super.state);
 
   void updateCity(String c) {
@@ -136,12 +146,12 @@ class AddressNotifier extends StateNotifier<Address> {
     state = state.copyWith(suite: s);
   }
 
-  void updateGeo(Geo g) {
+  void updateGeo(GeoEntity g) {
     state = state.copyWith(geo: g);
   }
 }
 
-class GeoNotifier extends StateNotifier<Geo> {
+class GeoNotifier extends StateNotifier<GeoEntity> {
   GeoNotifier(super.state);
 
   void updateLat(double d) {
@@ -167,12 +177,26 @@ class IdentityNumberNotifier extends StateNotifier<List<IdentityNumber>> {
       case IdentityNumber.win:
         number = IdentityNumber.win;
         return number.name;
+      case IdentityNumber.unknown:
+        number = IdentityNumber.unknown;
+        return number.name;
     }
   }
 }
 
 class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
-  BoatFormStateNotifier() : super(FormBoatAddState(Boat.empty()));
+  BoatFormStateNotifier(this._repository)
+      : super(FormBoatAddState(Boat.empty()));
+
+  final BoatsRepository _repository;
+
+  FormzSubmissionStatus? validator(Boat? b) {
+    if (b!.name.isEmpty) {
+      return FormzSubmissionStatus.failure;
+    } else {
+      return FormzSubmissionStatus.inProgress;
+    }
+  }
 
   void addBoat(Boat b) async {
     Boat form = state.form.copyWith(
@@ -200,6 +224,12 @@ class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
 
     state = state.copyWith(form: form.copyWith(boatId: boat.boatId));
   }
+
+  @override
+  void dispose() {
+    _repository.closeDatabase();
+    super.dispose();
+  }
 }
 
 // providers
@@ -208,12 +238,14 @@ final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) =>
         boatId: const BoatId(value: 0),
         name: 'name',
         ownerEntity: const OwnerEntity(
-            id: 0, name: 'name', phone: 'phone', address: Address()),
+            ownerId: OwnerId(value: 0), name: 'name', phone: 'phone'),
+        addressEntity: const AddressEntity(),
         types: TypesOfBoat.yacht,
         identityNumber: IdentityNumber.cin,
         cnp: CategoriesCNP.c,
         createdAt: DateTime.now(),
-        isAvailable: false)));
+        isAvailable: false,
+        ownerId: const OwnerId(value: 0))));
 
 final typesOfBoatNotifierProvider =
     StateNotifierProvider<TypesOfBoatNotifier, List<TypesOfBoat>>(
@@ -226,25 +258,25 @@ final categoriesCnpNotifierProvider =
 final ownerEntityNotifierProvider =
     StateNotifierProvider<OwnerEntityNotifier, OwnerEntity>((ref) =>
         OwnerEntityNotifier(const OwnerEntity(
-            id: 0,
+            ownerId: OwnerId(value: 0),
             name: 'ownerName',
-            phone: 'ownerPhone',
-            address: Address())));
+            phone: 'ownerPhone')));
 
-final addressNotifierProvider = StateNotifierProvider<AddressNotifier, Address>(
-    (_) => AddressNotifier(const Address(
-        city: 'city',
-        street: 'street',
-        suite: 'suite',
-        zipcode: 'zipCode',
-        geo: Geo())));
+final addressNotifierProvider =
+    StateNotifierProvider<AddressNotifier, AddressEntity>((_) =>
+        AddressNotifier(const AddressEntity(
+            city: 'city',
+            street: 'street',
+            suite: 'suite',
+            zipcode: 'zipCode',
+            geo: GeoEntity())));
 
 final identityNumberNotifierProvider =
     StateNotifierProvider<IdentityNumberNotifier, List<IdentityNumber>>(
         (_) => IdentityNumberNotifier(IdentityNumber.values));
 
-final geoNotifierProvider = StateNotifierProvider<GeoNotifier, Geo>(
-    (_) => GeoNotifier(const Geo(lat: 0.0, lng: 0.0)));
+final geoNotifierProvider = StateNotifierProvider<GeoNotifier, GeoEntity>(
+    (_) => GeoNotifier(const GeoEntity(lat: 0.0, lng: 0.0)));
 
 final boatFormStateNotifierProvider =
     StateNotifierProvider<BoatFormStateNotifier, FormBoatAddState>((ref) {

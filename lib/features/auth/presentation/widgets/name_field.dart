@@ -11,7 +11,7 @@ class NameField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final name = ref.watch(signUpProvider).nameFormz;
-    final bool showError = name!.invalid;
+    final bool showError = name!.isNotValid;
     final nameState = ref.watch(signUpProvider);
     final errorText = nameState.errorMessage;
 

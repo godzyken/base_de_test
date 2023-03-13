@@ -8,16 +8,19 @@ class AddBoatFormViewModel {
   AddBoatFormViewModel(final Boat? boat, this._boatListViewModel) {
     _initBoat(boat);
   }
-  late BoatId _id;
   final BoatListViewModel _boatListViewModel;
+
+  late BoatId _id;
+  late OwnerId _ownerId;
+
   var _name = '';
   var _boatIdentity = IdentityNumber.values;
-  OwnerEntity _owner = const OwnerEntity(
-      id: 0, name: 'name', phone: 'phone', address: Address());
+  OwnerEntity? _owner;
+  AddressEntity? _address;
   var _ownerName = '';
   var _isAvailable = false;
   var _types = TypesOfBoat.values;
-  var cnp = CategoriesCNP.values;
+  var _cnp = CategoriesCNP.values;
   final DateTime _initDate = DateTime.now();
   final DateTime _removeDate = DateTime.now();
   final DateTime _minimal = DateTime(DateTime.now().year);
@@ -31,11 +34,15 @@ class AddBoatFormViewModel {
   _initBoat(final Boat? boat) {
     if (boat == null) {
       _isNewBoat = true;
+      _ownerId = boat!.ownerId!;
     } else {
       _id = boat.boatId!;
       _name = boat.name;
+      _ownerId = boat.ownerId!;
+      _address = boat.addressEntity!;
       _boatIdentity = [];
       _types = [];
+      _cnp = [];
       _owner = boat.ownerEntity;
       _isAvailable = boat.isAvailable;
       _raison = boat.role!;
@@ -46,11 +53,13 @@ class AddBoatFormViewModel {
     if (_isNewBoat) {
       _boatListViewModel.addBoatLocation(
         _name,
+        _ownerId,
         _isAvailable,
-        _owner,
+        _owner!,
+        _address!,
         _boatIdentity.first,
         _types.first,
-        cnp.first,
+        _cnp.first,
         _initDate,
         _removeDate,
         _initDateTimeRange.start,
@@ -59,15 +68,18 @@ class AddBoatFormViewModel {
       );
     } else {
       final newBoat = Boat(
-          boatId: _id,
-          name: _name,
-          ownerEntity: _owner,
-          types: _types.single,
-          identityNumber: _boatIdentity.single,
-          cnp: cnp.single,
-          isAvailable: _isAvailable,
-          createdAt: _initDate,
-          role: _raison);
+        boatId: _id,
+        name: _name,
+        ownerEntity: _owner,
+        addressEntity: _address,
+        types: _types.first,
+        identityNumber: _boatIdentity.first,
+        cnp: _cnp.first,
+        isAvailable: _isAvailable,
+        createdAt: _initDate,
+        role: _raison,
+        ownerId: _ownerId,
+      );
 
       _boatListViewModel.updateBoat(newBoat);
     }
@@ -82,12 +94,14 @@ class AddBoatFormViewModel {
 
   String appBarTitle() => _isNewBoat ? 'Add Boat' : 'Edit Boat';
 
-  String initialUserNameValue() => _name;
+  String initialBoatNameValue() => _name;
   String initialOwnerNameValue() => _ownerName;
+  OwnerId initializeOwnerId() => _ownerId;
+  OwnerEntity? initializeOwnerEntityValue() => _owner!;
   List<IdentityNumber> initialBoatIdentityValue() => _boatIdentity;
   bool initialAvailableValue() => _isAvailable;
   List<TypesOfBoat> initialTypesOfBoatValue() => _types;
-  List<CategoriesCNP> initialCnpValue() => cnp;
+  List<CategoriesCNP> initialCnpValue() => _cnp;
   DateTime initialCreatedDateValue() => _initDate;
   DateTime datePickerFirstDate() => _minimal;
   DateTime datePickerLastDate() => _maximal;
@@ -97,7 +111,8 @@ class AddBoatFormViewModel {
 
   setName(final String value) => _name = value;
   setRole(final String value) => _raison = value;
-  setOwnerName(final String value) => _owner.copyWith(name: value).name;
+  setOwnerName(final String value) => _ownerName = value;
+  setOwnerId(final int value) => _ownerId.copyWith(value: value).value;
 
   setBoatIdentity(final List<IdentityNumber> value) => _boatIdentity = value;
   setTypesBoat(final List<TypesOfBoat> value) {
@@ -108,7 +123,7 @@ class AddBoatFormViewModel {
   }
 
   setIsAvailable(final bool value) => _isAvailable = value;
-  setCategoryCnp(final List<CategoriesCNP> value) => cnp = value;
+  setCategoryCnp(final List<CategoriesCNP> value) => _cnp = value;
   setStartLocation(final DateTime value) => _initDateTimeRange.start;
   setStopLocation(final DateTime value) => _initDateTimeRange.end;
 
@@ -126,6 +141,17 @@ class AddBoatFormViewModel {
     if (_name.isEmpty || _ownerName.isNotEmpty) {
       return 'Enter a name';
     } else if (_name.length > 20 || _ownerName.length > 20) {
+      return 'Limit the name to 20 characters';
+    } else {
+      return value;
+    }
+  }
+
+  String? validateRole(value) {
+    _raison = value;
+    if (_raison.isEmpty) {
+      return 'Enter a raison';
+    } else if (_raison.length > 20) {
       return 'Limit the name to 20 characters';
     } else {
       return value;
@@ -172,11 +198,13 @@ final boatListFutureProvider = FutureProvider.autoDispose
 
   return boatListViewModel.addBoatLocation(
       filter._name,
+      filter._ownerId,
       filter._isAvailable,
-      filter._owner,
+      filter._owner!,
+      filter._address!,
       filter._boatIdentity.first,
       filter._types.first,
-      filter.cnp.first,
+      filter._cnp.first,
       filter._initDate,
       filter._removeDate,
       filter._initDateTimeRange.start,

@@ -10,7 +10,7 @@ class PasswordField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final password = ref.watch(signInNotifierProvider).passwordFormz;
-    final bool showError = password!.invalid;
+    final bool showError = password!.isNotValid;
     final passwordState = ref.watch(signInNotifierProvider);
     final errorText = passwordState.errorMessage;
 

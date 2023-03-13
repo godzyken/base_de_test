@@ -4,8 +4,10 @@ abstract class UpdateBoatLocationUseCase {
   Future<void> execute(
     final BoatId id,
     final String name,
+    final OwnerId ownerId,
     final IdentityNumber identityNumber,
     final OwnerEntity ownerEntity,
+    final AddressEntity addressEntity,
     final TypesOfBoat types,
     final CategoriesCNP cnp,
     final bool isAvailable,

@@ -16,7 +16,7 @@ class SignUpScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen<SignUpState>(signUpProvider, (previous, next) {
-      if (next.status!.isSubmissionInProgress) {
+      if (next.status!.isInProgress) {
         showDialog(
             context: context,
             builder: (_) => SimpleDialog(
@@ -25,7 +25,7 @@ class SignUpScreen extends ConsumerWidget {
                     child: Text(context.tr.loading),
                   ),
                 ));
-      } else if (next.status!.isSubmissionFailure) {
+      } else if (next.status!.isFailure) {
         Navigator.of(context).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -33,12 +33,12 @@ class SignUpScreen extends ConsumerWidget {
             content: Text("${next.errorMessage}"),
           ),
         );
-      } else if (next.status!.isSubmissionSuccess) {
+      } else if (next.status!.isSuccess) {
         Navigator.of(context).pop();
       }
     });
-    return Column(
-      children: const [
+    return const Column(
+      children: [
         NameField(),
         SizedBox(
           height: 16,

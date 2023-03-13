@@ -3,7 +3,9 @@ import '../entities/entities.dart';
 abstract class CreateBoatLocationCase {
   Future<Boat> execute(
     final String name,
+    final OwnerId ownerId,
     final OwnerEntity ownerEntity,
+    final AddressEntity addressEntity,
     final IdentityNumber identityNumber,
     final TypesOfBoat typesOfBoat,
     final CategoriesCNP cnp,

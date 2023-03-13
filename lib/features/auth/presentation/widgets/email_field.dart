@@ -11,7 +11,7 @@ class EmailField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final email = ref.watch(signInNotifierProvider).emailFormz;
-    final bool showError = email!.invalid;
+    final bool showError = email!.isNotValid;
     final emailState = ref.watch(signInNotifierProvider);
     final errorText = emailState.errorMessage;
 

@@ -31,7 +31,7 @@ mixin _$SignUpState {
       includeFromJson: false,
       includeToJson: false)
   PasswordFormz? get passwordFormz => throw _privateConstructorUsedError;
-  FormzStatus? get status => throw _privateConstructorUsedError;
+  FormzSubmissionStatus? get status => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,7 +53,7 @@ abstract class $SignUpStateCopyWith<$Res> {
           EmailFormz? emailFormz,
       @JsonKey(defaultValue: 'PasswordFormz', includeFromJson: false, includeToJson: false)
           PasswordFormz? passwordFormz,
-      FormzStatus? status,
+      FormzSubmissionStatus? status,
       String? errorMessage});
 }
 
@@ -92,7 +92,7 @@ class _$SignUpStateCopyWithImpl<$Res, $Val extends SignUpState>
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as FormzStatus?,
+              as FormzSubmissionStatus?,
       errorMessage: freezed == errorMessage
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -116,7 +116,7 @@ abstract class _$$_SignUpStateCopyWith<$Res>
           EmailFormz? emailFormz,
       @JsonKey(defaultValue: 'PasswordFormz', includeFromJson: false, includeToJson: false)
           PasswordFormz? passwordFormz,
-      FormzStatus? status,
+      FormzSubmissionStatus? status,
       String? errorMessage});
 }
 
@@ -153,7 +153,7 @@ class __$$_SignUpStateCopyWithImpl<$Res>
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as FormzStatus?,
+              as FormzSubmissionStatus?,
       errorMessage: freezed == errorMessage
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -173,7 +173,7 @@ class _$_SignUpState implements _SignUpState {
           this.emailFormz,
       @JsonKey(defaultValue: 'PasswordFormz', includeFromJson: false, includeToJson: false)
           this.passwordFormz,
-      this.status = FormzStatus.pure,
+      this.status = FormzSubmissionStatus.initial,
       this.errorMessage});
 
   factory _$_SignUpState.fromJson(Map<String, dynamic> json) =>
@@ -195,7 +195,7 @@ class _$_SignUpState implements _SignUpState {
   final PasswordFormz? passwordFormz;
   @override
   @JsonKey()
-  final FormzStatus? status;
+  final FormzSubmissionStatus? status;
   @override
   final String? errorMessage;
 
@@ -247,7 +247,7 @@ abstract class _SignUpState implements SignUpState {
           final EmailFormz? emailFormz,
       @JsonKey(defaultValue: 'PasswordFormz', includeFromJson: false, includeToJson: false)
           final PasswordFormz? passwordFormz,
-      final FormzStatus? status,
+      final FormzSubmissionStatus? status,
       final String? errorMessage}) = _$_SignUpState;
 
   factory _SignUpState.fromJson(Map<String, dynamic> json) =
@@ -268,7 +268,7 @@ abstract class _SignUpState implements SignUpState {
       includeToJson: false)
   PasswordFormz? get passwordFormz;
   @override
-  FormzStatus? get status;
+  FormzSubmissionStatus? get status;
   @override
   String? get errorMessage;
   @override

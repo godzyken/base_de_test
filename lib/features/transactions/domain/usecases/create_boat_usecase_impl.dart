@@ -1,4 +1,4 @@
-import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
+import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
 import 'package:base_de_test/features/transactions/domain/repositories/boats_repository.dart';
 
 import 'create_boat_usecase.dart';
@@ -11,7 +11,9 @@ class CreateBoatLocationCaseImpl implements CreateBoatLocationCase {
   @override
   Future<Boat> execute(
     final String name,
+    final OwnerId ownerId,
     final OwnerEntity ownerEntity,
+    final AddressEntity addressEntity,
     final IdentityNumber identityNumber,
     final TypesOfBoat types,
     final CategoriesCNP cnp,
@@ -24,7 +26,9 @@ class CreateBoatLocationCaseImpl implements CreateBoatLocationCase {
   ) {
     return _repository.createBoat(
       name,
+      ownerId,
       ownerEntity,
+      addressEntity,
       types,
       identityNumber,
       cnp,

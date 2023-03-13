@@ -8,23 +8,22 @@ part of 'sign_in_state.dart';
 
 _$_SignInState _$$_SignInStateFromJson(Map<String, dynamic> json) =>
     _$_SignInState(
-      status: $enumDecodeNullable(_$FormzStatusEnumMap, json['status']) ??
-          FormzStatus.pure,
+      status:
+          $enumDecodeNullable(_$FormzSubmissionStatusEnumMap, json['status']) ??
+              FormzSubmissionStatus.initial,
       errorMessage: json['error_message'] as String?,
     );
 
 Map<String, dynamic> _$$_SignInStateToJson(_$_SignInState instance) =>
     <String, dynamic>{
-      'status': _$FormzStatusEnumMap[instance.status],
+      'status': _$FormzSubmissionStatusEnumMap[instance.status],
       'error_message': instance.errorMessage,
     };
 
-const _$FormzStatusEnumMap = {
-  FormzStatus.pure: 'pure',
-  FormzStatus.valid: 'valid',
-  FormzStatus.invalid: 'invalid',
-  FormzStatus.submissionInProgress: 'submissionInProgress',
-  FormzStatus.submissionSuccess: 'submissionSuccess',
-  FormzStatus.submissionFailure: 'submissionFailure',
-  FormzStatus.submissionCanceled: 'submissionCanceled',
+const _$FormzSubmissionStatusEnumMap = {
+  FormzSubmissionStatus.initial: 'initial',
+  FormzSubmissionStatus.inProgress: 'inProgress',
+  FormzSubmissionStatus.success: 'success',
+  FormzSubmissionStatus.failure: 'failure',
+  FormzSubmissionStatus.canceled: 'canceled',
 };

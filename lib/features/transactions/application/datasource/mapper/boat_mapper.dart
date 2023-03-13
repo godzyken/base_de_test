@@ -1,6 +1,4 @@
-import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat/boat_id.dart';
-
+import '../../../domain/entities/entities.dart';
 import '../entity/boats_entity.dart';
 
 class BoatMapper {
@@ -8,7 +6,13 @@ class BoatMapper {
     return Boat(
         boatId: BoatId(value: entity['id']),
         name: entity['name'],
-        ownerEntity: entity['owner'],
+        ownerId: OwnerId(value: entity['owner_id']),
+        ownerEntity: OwnerEntity(
+          ownerId: entity['id'],
+          name: entity['owner_name'],
+          phone: entity[''],
+        ),
+        addressEntity: AddressEntity(street: entity['street']),
         types: entity['types'],
         identityNumber: entity['matriculation'],
         cnp: entity['cnp'],
@@ -24,7 +28,9 @@ class BoatMapper {
     return {
       'id': model.boatId?.value,
       'name': model.name,
+      'owner_id': model.ownerId?.value,
       'ownerEntity': model.ownerEntity,
+      'addressEntity': model.addressEntity,
       'types': model.types,
       'cnp': model.cnp,
       'identity_number': model.identityNumber,
@@ -39,7 +45,9 @@ class BoatMapper {
 
   static BoatEntity transformToNewEntityMap(
       final String name,
+      final OwnerId ownerId,
       final OwnerEntity owner,
+      final AddressEntity address,
       final CategoriesCNP cnp,
       final IdentityNumber identityNumber,
       final bool isAvailable,
@@ -52,7 +60,9 @@ class BoatMapper {
     return {
       'id': null,
       'name': name,
+      'owner_id': ownerId,
       'ownerEntity': owner,
+      'AddressEntity': address,
       'types': typesOfBoat,
       'cnp': cnp,
       'identity_number': identityNumber,

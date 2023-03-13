@@ -8,23 +8,22 @@ part of 'sign_up_state.dart';
 
 _$_SignUpState _$$_SignUpStateFromJson(Map<String, dynamic> json) =>
     _$_SignUpState(
-      status: $enumDecodeNullable(_$FormzStatusEnumMap, json['status']) ??
-          FormzStatus.pure,
+      status:
+          $enumDecodeNullable(_$FormzSubmissionStatusEnumMap, json['status']) ??
+              FormzSubmissionStatus.initial,
       errorMessage: json['error_message'] as String?,
     );
 
 Map<String, dynamic> _$$_SignUpStateToJson(_$_SignUpState instance) =>
     <String, dynamic>{
-      'status': _$FormzStatusEnumMap[instance.status],
+      'status': _$FormzSubmissionStatusEnumMap[instance.status],
       'error_message': instance.errorMessage,
     };
 
-const _$FormzStatusEnumMap = {
-  FormzStatus.pure: 'pure',
-  FormzStatus.valid: 'valid',
-  FormzStatus.invalid: 'invalid',
-  FormzStatus.submissionInProgress: 'submissionInProgress',
-  FormzStatus.submissionSuccess: 'submissionSuccess',
-  FormzStatus.submissionFailure: 'submissionFailure',
-  FormzStatus.submissionCanceled: 'submissionCanceled',
+const _$FormzSubmissionStatusEnumMap = {
+  FormzSubmissionStatus.initial: 'initial',
+  FormzSubmissionStatus.inProgress: 'inProgress',
+  FormzSubmissionStatus.success: 'success',
+  FormzSubmissionStatus.failure: 'failure',
+  FormzSubmissionStatus.canceled: 'canceled',
 };

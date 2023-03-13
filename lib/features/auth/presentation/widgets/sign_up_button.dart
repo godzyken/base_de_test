@@ -12,7 +12,7 @@ class SignUpButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final signUpState = ref.watch(signUpProvider);
     final signUpController = ref.read(signUpProvider.notifier);
-    final bool isValidated = signUpState.status!.isValidated;
+    final bool isValidated = signUpState.status!.isSuccess;
 
     return ElevatedButton(
         onPressed: isValidated

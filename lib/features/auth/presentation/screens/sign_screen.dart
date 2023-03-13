@@ -28,7 +28,7 @@ class SignInScreen extends ConsumerWidget {
               SubmitButton(
                 onPressed: () => signInController.signInWithPassword(),
                 enabled: ref.watch(signInNotifierProvider).status ==
-                    FormzStatus.valid,
+                    FormzSubmissionStatus.success,
                 text: context.tr.submit,
               ),
             ],

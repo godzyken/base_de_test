@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:base_de_test/features/transactions/application/datasource/database/source_base.dart';
@@ -8,12 +9,15 @@ import 'package:sqflite/sqflite.dart';
 class BoatDatabaseImpl implements SourceBase {
   static const _databaseName = 'boats_database';
   static const _tableName = 'boats_table';
+  static const _tableOwner = 'owner_table';
   static const _databaseVersion = 1;
   static const _columnId = 'id';
+  static const _columnOwnerId = 'owner_id';
   static const _columnName = 'name';
+  static const _columnPhone = 'phone';
+  static const _columnAddress = 'address';
   static const _columnIdentityNumber = 'matricule';
   static const _columnCategoryCnp = 'cnp';
-  static const _columnOwner = 'owner';
   static const _columnAvailable = 'available';
   static const _columnCreatedAt = 'create_date';
   static const _columnDeletedAt = 'deleted_date';
@@ -83,31 +87,54 @@ class BoatDatabaseImpl implements SourceBase {
     try {
       var databasePath = await getDatabasesPath();
       String p = path.join(databasePath, _databaseName);
+      await Sqflite.setDebugModeOn(true);
       return openDatabase(
         p,
-        onCreate: (db, _) {
-          db.execute('''
-          CREATE TABLE IF NOT EXISTS $_tableName(
-              $_columnId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-              $_columnName TEXT NOT NULL,
-              $_columnOwner TEXT NOT NULL,
-              $_columnAvailable BOOLEAN NOT NULL,
-              $_columnIdentityNumber TEXT NOT NULL,
-              $_columnCategoryCnp TEXT NOT NULL,
-              $_columnCreatedAt INTEGER NOT NULL,
-              $_columnDeletedAt INTEGER NOT NULL,
-              $_columnRentedAt INTEGER NOT NULL,
-              $_columnReturnAt INTEGER NOT NULL,
-              $_columnRole TEXT NOT NULL
-            )
-          ''');
-        },
+        onConfigure: (db) => _onConfigure(db),
+        onOpen: (db) => _onOpen(db),
+        onCreate: (db, version) => _onCreate(db, version),
         version: _databaseVersion,
       );
     } on Exception catch (e) {
       log('database initialisation error : $e');
       return database;
     }
+  }
+
+  static void _onCreate(Database db, int version) async {
+    await db.execute('''
+          CREATE TABLE IF NOT EXISTS $_tableName(
+          $_columnId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          $_columnName TEXT NOT NULL,
+          $_columnAvailable BOOLEAN NOT NULL,
+          $_columnIdentityNumber TEXT NOT NULL,
+          $_columnCategoryCnp TEXT NOT NULL,
+          $_columnCreatedAt INTEGER NOT NULL,
+          $_columnDeletedAt INTEGER NOT NULL,
+          $_columnRentedAt INTEGER NOT NULL,
+          $_columnReturnAt INTEGER NOT NULL,
+          $_columnRole TEXT NOT NULL,
+          $_columnOwnerId INTEGER NOT NULL,
+          FOREIGN KEY ($_columnOwnerId) REFERENCES $_tableOwner(id)
+        )
+      ''');
+    await db.execute('''
+          CREATE TABLE IF NOT EXISTS $_tableOwner(
+          $_columnOwnerId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          $_columnName TEXT NOT NULL,
+          $_columnPhone INTEGER NOT NULL,
+          $_columnAddress TEXT NOT NULL
+        )
+      ''');
+  }
+
+  static void _onConfigure(Database db) async {
+    await db.execute("PRAGMA foreign_keys = ON");
+    await db.rawQuery('PRAGMA journal_mode=WAL');
+  }
+
+  static void _onOpen(Database db) async {
+    log('database version: ${await db.getVersion()}');
   }
 
   @override

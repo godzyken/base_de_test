@@ -22,8 +22,8 @@ const String _kPasswordPattern =
     r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$€¤£%^&*-]).{8,}$';
 
 class PasswordFormz extends FormzInput<String, PasswordValidationError> {
-  const PasswordFormz.pure() : super.pure('');
-  const PasswordFormz.dirty([String value = '']) : super.dirty(value);
+  const PasswordFormz.pure([super.value = '']) : super.pure();
+  const PasswordFormz.dirty([super.value = '']) : super.dirty();
 
   static final _regex = RegExp(_kPasswordPattern);
 

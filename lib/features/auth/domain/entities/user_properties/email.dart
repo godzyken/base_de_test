@@ -18,11 +18,11 @@ const String _kEmailPattern =
     r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
 
 class EmailFormz extends FormzInput<String, EmailValidationError> {
-  const EmailFormz.pure() : super.pure('');
+  const EmailFormz.pure([super.value = '']) : super.pure();
 
   EmailFormz._() : super.dirty('');
 
-  const EmailFormz.dirty([String value = '']) : super.dirty(value);
+  const EmailFormz.dirty([super.value = '']) : super.dirty();
 
   static final _regex = RegExp(_kEmailPattern);
 

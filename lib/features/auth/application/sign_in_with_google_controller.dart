@@ -9,7 +9,7 @@ class SignInWithGoogleController extends StateNotifier<bool> {
   final Ref _ref;
 
   Future<void> signInWithGoogle() async {
-    log('here2');
+    log('Sign in with Google 2');
     await _ref.read(authRepositoryProvider).signInWithGoogle();
   }
 }

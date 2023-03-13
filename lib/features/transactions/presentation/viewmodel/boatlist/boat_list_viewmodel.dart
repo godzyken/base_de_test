@@ -40,8 +40,10 @@ class BoatListViewModel extends StateNotifier<State<BoatList>> {
 
   addBoatLocation(
     final String name,
+    final OwnerId ownerId,
     final bool isAvailable,
     final OwnerEntity ownerEntity,
+    final AddressEntity addressEntity,
     final IdentityNumber identityNumber,
     final TypesOfBoat typesOfBoat,
     final CategoriesCNP cnp,
@@ -54,7 +56,9 @@ class BoatListViewModel extends StateNotifier<State<BoatList>> {
     try {
       final newBoat = await _createBoatLocationCase.execute(
           name,
+          ownerId,
           ownerEntity,
+          addressEntity,
           identityNumber,
           typesOfBoat,
           cnp,
@@ -76,8 +80,10 @@ class BoatListViewModel extends StateNotifier<State<BoatList>> {
       await _updateBoatLocationUseCase.execute(
           newBoat.boatId!,
           newBoat.name,
+          newBoat.ownerId!,
           newBoat.identityNumber,
-          newBoat.ownerEntity,
+          newBoat.ownerEntity!,
+          newBoat.addressEntity!,
           newBoat.types,
           newBoat.cnp,
           newBoat.isAvailable,

@@ -15,52 +15,30 @@ class SignUpController extends StateNotifier<SignUpState> {
   void onNameChange(String value) {
     final name = NameFormz.dirty(value);
 
-    state = state.copyWith(
-      nameFormz: name,
-      status: Formz.validate([
-        name,
-        state.emailFormz!,
-        state.passwordFormz!,
-      ]),
-    );
+    state = state.copyWith(nameFormz: name);
   }
 
   void onEmailChange(String v) {
     final email = EmailFormz.dirty(v);
-
-    state = state.copyWith(
-      emailFormz: email,
-      status: Formz.validate([
-        state.nameFormz!,
-        email,
-        state.passwordFormz!,
-      ]),
-    );
+    state = state.copyWith(emailFormz: email);
   }
 
   void onPasswordChange(String p) {
     final password = PasswordFormz.dirty(p);
 
-    state = state.copyWith(
-      passwordFormz: password,
-      status: Formz.validate([
-        state.nameFormz!,
-        state.emailFormz!,
-        password,
-      ]),
-    );
+    state = state.copyWith(passwordFormz: password);
   }
 
   void signUpWithEmailAndPassword() async {
-    state = state.copyWith(status: FormzStatus.submissionInProgress);
+    state = state.copyWith(status: FormzSubmissionStatus.inProgress);
     try {
       await _authRepository.signUp(state.emailFormz!.value,
           state.nameFormz!.value, state.passwordFormz!.value);
 
-      state = state.copyWith(status: FormzStatus.submissionSuccess);
+      state = state.copyWith(status: FormzSubmissionStatus.success);
     } catch (e) {
       state = state.copyWith(
-          status: FormzStatus.submissionFailure, errorMessage: e.toString());
+          status: FormzSubmissionStatus.failure, errorMessage: e.toString());
     }
   }
 }

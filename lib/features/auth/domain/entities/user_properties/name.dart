@@ -7,7 +7,7 @@ enum NameValidationError {
   String getMessage() {
     switch (this) {
       case empty:
-        return 'Email can\'t be empty';
+        return 'User name can\'t be empty';
       case invalid:
         return 'Too short name';
     }
@@ -16,7 +16,7 @@ enum NameValidationError {
 
 class NameFormz extends FormzInput<String, NameValidationError> {
   const NameFormz.pure() : super.pure('');
-  const NameFormz.dirty([String value = '']) : super.dirty(value);
+  const NameFormz.dirty([super.value = '']) : super.dirty();
 
   @override
   NameValidationError? validator(String value) {
