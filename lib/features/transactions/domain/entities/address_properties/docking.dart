@@ -2,9 +2,9 @@ import 'package:formz/formz.dart';
 
 import '../../../../auth/domain/entities/user_properties/name.dart';
 
-class StreetNameFormz extends FormzInput<String, NameValidationError> {
-  const StreetNameFormz.pure([super.value = '']) : super.pure();
-  const StreetNameFormz.dirty([super.value = '']) : super.dirty();
+class DockingFormz extends FormzInput<String, NameValidationError> {
+  const DockingFormz.pure([super.value = '']) : super.pure();
+  const DockingFormz.dirty([super.value = '']) : super.dirty();
 
   @override
   NameValidationError? validator(String value) {
@@ -48,32 +48,6 @@ class CityNameFormz extends FormzInput<String, NameValidationError> {
       return 'Empty City name';
     } else if (error == NameValidationError.invalid) {
       return 'Too short city name';
-    } else {
-      return null;
-    }
-  }
-}
-
-class SuiteNameFormz extends FormzInput<String, NameValidationError> {
-  const SuiteNameFormz.pure([super.value = '']) : super.pure();
-  const SuiteNameFormz.dirty([super.value = '']) : super.dirty();
-
-  @override
-  NameValidationError? validator(String value) {
-    if (value.isEmpty) {
-      return NameValidationError.empty;
-    } else if (value.length < 3) {
-      return NameValidationError.invalid;
-    } else {
-      return null;
-    }
-  }
-
-  static String? showCityNameErrorMessage(NameValidationError? error) {
-    if (error == NameValidationError.empty) {
-      return 'Empty Suite name';
-    } else if (error == NameValidationError.invalid) {
-      return 'Too short Suite name';
     } else {
       return null;
     }

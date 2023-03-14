@@ -7,6 +7,7 @@ abstract class UpdateBoatLocationUseCase {
     final OwnerId ownerId,
     final IdentityNumber identityNumber,
     final OwnerEntity ownerEntity,
+    final AddressId addressId,
     final AddressEntity addressEntity,
     final TypesOfBoat types,
     final CategoriesCNP cnp,

@@ -22,6 +22,18 @@ class BoatNotifier extends StateNotifier<Boat> {
     state = state.copyWith.ownerEntity!.ownerId(value: id);
   }
 
+  void updateCityName(String n) {
+    state =
+        state.copyWith(addressEntity: state.addressEntity?.copyWith(city: n));
+    int id = 3 + DateTime.now().millisecondsSinceEpoch;
+    state = state.copyWith(addressId: state.addressId?.copyWith(value: id));
+    state = state.copyWith.addressEntity!.id!(value: id);
+  }
+
+  void updateOwnerPhone(String p) {
+    state = state.copyWith(ownerEntity: state.ownerEntity?.copyWith(phone: p));
+  }
+
   void updateRole(String r) {
     state = state.copyWith(role: r);
   }
@@ -56,6 +68,17 @@ class BoatNotifier extends StateNotifier<Boat> {
 
   void updateIsAvailableValue(bool b) {
     state = state.copyWith(isAvailable: b, isChecked: b);
+  }
+
+  void updateDockingTypeValue(String d) {
+    state = state.copyWith(
+        addressEntity:
+            state.addressEntity?.copyWith(docking: Docking.values.byName(d)));
+  }
+
+  void updateZipCode(String z) {
+    state = state.copyWith(
+        addressEntity: state.addressEntity?.copyWith(zipcode: z));
   }
 }
 
@@ -134,16 +157,12 @@ class AddressNotifier extends StateNotifier<AddressEntity> {
     state = state.copyWith(city: c);
   }
 
-  void updateStreet(String s) {
-    state = state.copyWith(street: s);
+  void updateDocking(Docking s) {
+    state = state.copyWith(docking: s);
   }
 
   void updateZipCode(String z) {
     state = state.copyWith(zipcode: z);
-  }
-
-  void updateSuite(String s) {
-    state = state.copyWith(suite: s);
   }
 
   void updateGeo(GeoEntity g) {
@@ -160,6 +179,27 @@ class GeoNotifier extends StateNotifier<GeoEntity> {
 
   void updateLong(double lon) {
     state = state.copyWith(lng: lon);
+  }
+}
+
+class DockingNotifier extends StateNotifier<List<Docking>> {
+  DockingNotifier(super.state);
+
+  String? selectDockingType(Docking doc) {
+    switch (doc) {
+      case Docking.harbor:
+        doc = Docking.harbor;
+        return doc.name;
+      case Docking.couple:
+        doc = Docking.couple;
+        return doc.name;
+      case Docking.marinas:
+        doc = Docking.marinas;
+        return doc.name;
+      case Docking.anchoring:
+        doc = Docking.anchoring;
+        return doc.name;
+    }
   }
 }
 
@@ -239,7 +279,13 @@ final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) =>
         name: 'name',
         ownerEntity: const OwnerEntity(
             ownerId: OwnerId(value: 0), name: 'name', phone: 'phone'),
-        addressEntity: const AddressEntity(),
+        addressId: const AddressId(value: 0),
+        addressEntity: const AddressEntity(
+            id: AddressId(value: 0),
+            docking: Docking.anchoring,
+            city: 'city',
+            zipcode: 'zip_code',
+            geo: GeoEntity()),
         types: TypesOfBoat.yacht,
         identityNumber: IdentityNumber.cin,
         cnp: CategoriesCNP.c,
@@ -265,11 +311,15 @@ final ownerEntityNotifierProvider =
 final addressNotifierProvider =
     StateNotifierProvider<AddressNotifier, AddressEntity>((_) =>
         AddressNotifier(const AddressEntity(
+            id: AddressId(value: 0),
             city: 'city',
-            street: 'street',
-            suite: 'suite',
+            docking: Docking.anchoring,
             zipcode: 'zipCode',
             geo: GeoEntity())));
+
+final dockingNotifierProvider =
+    StateNotifierProvider<DockingNotifier, List<Docking>>(
+        (_) => DockingNotifier(Docking.values));
 
 final identityNumberNotifierProvider =
     StateNotifierProvider<IdentityNumberNotifier, List<IdentityNumber>>(

@@ -4,8 +4,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 part 'auth_state.freezed.dart';
 part 'auth_state.g.dart';
 
+@JsonEnum()
 enum AuthStatus {
+  @JsonValue("authenticated")
   authenticated,
+  @JsonValue("unauthenticated")
   unauthenticated,
 }
 

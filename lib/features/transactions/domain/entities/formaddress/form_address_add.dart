@@ -1,4 +1,4 @@
-import 'package:base_de_test/features/transactions/domain/entities/address_properties/street.dart';
+import 'package:base_de_test/features/transactions/domain/entities/address_properties/docking.dart';
 import 'package:formz/formz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -10,17 +10,11 @@ class FormAddressAddState with _$FormAddressAddState {
   @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
   const factory FormAddressAddState({
     @JsonKey(
-      defaultValue: 'Street name',
+      defaultValue: 'Docking',
       includeToJson: false,
       includeFromJson: false,
     )
-        StreetNameFormz? streetNameFormz,
-    @JsonKey(
-      defaultValue: 'Suite name',
-      includeToJson: false,
-      includeFromJson: false,
-    )
-        SuiteNameFormz? suiteNameFormz,
+        DockingFormz? dockingFormz,
     @JsonKey(
       defaultValue: 'City name',
       includeToJson: false,

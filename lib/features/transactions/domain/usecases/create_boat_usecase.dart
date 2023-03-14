@@ -5,6 +5,7 @@ abstract class CreateBoatLocationCase {
     final String name,
     final OwnerId ownerId,
     final OwnerEntity ownerEntity,
+    final AddressId addressId,
     final AddressEntity addressEntity,
     final IdentityNumber identityNumber,
     final TypesOfBoat typesOfBoat,

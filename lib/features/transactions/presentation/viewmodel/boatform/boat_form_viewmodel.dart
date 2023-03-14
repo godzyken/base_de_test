@@ -12,12 +12,16 @@ class AddBoatFormViewModel {
 
   late BoatId _id;
   late OwnerId _ownerId;
+  late AddressId _addressId;
 
   var _name = '';
   var _boatIdentity = IdentityNumber.values;
   OwnerEntity? _owner;
   AddressEntity? _address;
   var _ownerName = '';
+  var _cityName = '';
+  var _zipCode = '';
+  var _ownerPhone = '';
   var _isAvailable = false;
   var _types = TypesOfBoat.values;
   var _cnp = CategoriesCNP.values;
@@ -34,11 +38,13 @@ class AddBoatFormViewModel {
   _initBoat(final Boat? boat) {
     if (boat == null) {
       _isNewBoat = true;
-      _ownerId = boat!.ownerId!;
+      // _ownerId = boat!.ownerId!;
+      // _addressId = boat.addressId!;
     } else {
       _id = boat.boatId!;
       _name = boat.name;
       _ownerId = boat.ownerId!;
+      _addressId = boat.addressId!;
       _address = boat.addressEntity!;
       _boatIdentity = [];
       _types = [];
@@ -51,11 +57,17 @@ class AddBoatFormViewModel {
 
   createOrUpdateBoat() {
     if (_isNewBoat) {
+      var value = 1 + DateTime.now().millisecondsSinceEpoch;
+
+      _addressId = setAddressId(value);
+      _ownerId = setOwnerId(value);
+
       _boatListViewModel.addBoatLocation(
         _name,
         _ownerId,
         _isAvailable,
         _owner!,
+        _addressId,
         _address!,
         _boatIdentity.first,
         _types.first,
@@ -67,10 +79,11 @@ class AddBoatFormViewModel {
         _raison,
       );
     } else {
-      final newBoat = Boat(
+      final oldBoat = Boat(
         boatId: _id,
         name: _name,
         ownerEntity: _owner,
+        addressId: _addressId,
         addressEntity: _address,
         types: _types.first,
         identityNumber: _boatIdentity.first,
@@ -80,8 +93,7 @@ class AddBoatFormViewModel {
         role: _raison,
         ownerId: _ownerId,
       );
-
-      _boatListViewModel.updateBoat(newBoat);
+      _boatListViewModel.updateBoat(oldBoat);
     }
   }
 
@@ -96,7 +108,9 @@ class AddBoatFormViewModel {
 
   String initialBoatNameValue() => _name;
   String initialOwnerNameValue() => _ownerName;
+  String initialOwnerPhoneValue() => _ownerPhone;
   OwnerId initializeOwnerId() => _ownerId;
+  AddressId initializeAddressId() => _addressId;
   OwnerEntity? initializeOwnerEntityValue() => _owner!;
   List<IdentityNumber> initialBoatIdentityValue() => _boatIdentity;
   bool initialAvailableValue() => _isAvailable;
@@ -112,7 +126,15 @@ class AddBoatFormViewModel {
   setName(final String value) => _name = value;
   setRole(final String value) => _raison = value;
   setOwnerName(final String value) => _ownerName = value;
+  setCityName(final String value) => _cityName = value;
+  setZipCode(final String value) => _zipCode = value;
+  setOwnerPhone(final String value) => _ownerPhone = value;
   setOwnerId(final int value) => _ownerId.copyWith(value: value).value;
+
+  setAddressId(final int value) {
+    var i = value + 3 + DateTime.now().millisecondsSinceEpoch;
+    _addressId.copyWith(value: i).value;
+  }
 
   setBoatIdentity(final List<IdentityNumber> value) => _boatIdentity = value;
   setTypesBoat(final List<TypesOfBoat> value) {
@@ -135,23 +157,30 @@ class AddBoatFormViewModel {
     }
   }
 
-  String? validateName(value) {
-    _name = value;
-    _ownerName = value;
-    if (_name.isEmpty || _ownerName.isNotEmpty) {
+  String? validateName(String value) {
+    if (value.isEmpty) {
       return 'Enter a name';
-    } else if (_name.length > 20 || _ownerName.length > 20) {
+    } else if (value.length > 20) {
       return 'Limit the name to 20 characters';
     } else {
       return value;
     }
   }
 
-  String? validateRole(value) {
-    _raison = value;
-    if (_raison.isEmpty) {
+  String? validatePhone(String value) {
+    if (value.isEmpty) {
+      return 'Enter a phone';
+    } else if (value.length > 20) {
+      return 'Limit the name to 20 characters';
+    } else {
+      return value;
+    }
+  }
+
+  String? validateRole(String value) {
+    if (value.isEmpty) {
       return 'Enter a raison';
-    } else if (_raison.length > 20) {
+    } else if (value.length > 20) {
       return 'Limit the name to 20 characters';
     } else {
       return value;
@@ -201,6 +230,7 @@ final boatListFutureProvider = FutureProvider.autoDispose
       filter._ownerId,
       filter._isAvailable,
       filter._owner!,
+      filter._addressId,
       filter._address!,
       filter._boatIdentity.first,
       filter._types.first,

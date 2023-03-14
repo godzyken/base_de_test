@@ -10,12 +10,13 @@ class BoatDatabaseImpl implements SourceBase {
   static const _databaseName = 'boats_database';
   static const _tableName = 'boats_table';
   static const _tableOwner = 'owner_table';
+  static const _tableAddress = 'address_table';
   static const _databaseVersion = 1;
   static const _columnId = 'id';
   static const _columnOwnerId = 'owner_id';
   static const _columnName = 'name';
   static const _columnPhone = 'phone';
-  static const _columnAddress = 'address';
+  static const _columnAddressId = 'address_id';
   static const _columnIdentityNumber = 'matricule';
   static const _columnCategoryCnp = 'cnp';
   static const _columnAvailable = 'available';
@@ -24,6 +25,10 @@ class BoatDatabaseImpl implements SourceBase {
   static const _columnRentedAt = 'rent_date';
   static const _columnReturnAt = 'return_date';
   static const _columnRole = 'return_role';
+  static const _columnDocking = 'docking';
+  static const _columnCity = 'city';
+  static const _columnZipCode = 'zip_code';
+  static const _columnGeo = 'geo';
   static Database? _database;
 
   Future<Database> get database async {
@@ -115,15 +120,25 @@ class BoatDatabaseImpl implements SourceBase {
           $_columnReturnAt INTEGER NOT NULL,
           $_columnRole TEXT NOT NULL,
           $_columnOwnerId INTEGER NOT NULL,
-          FOREIGN KEY ($_columnOwnerId) REFERENCES $_tableOwner(id)
+          $_columnAddressId INTEGER NOT NULL,
+          FOREIGN KEY ($_columnOwnerId) REFERENCES $_tableOwner(id),
+          FOREIGN KEY ($_columnAddressId) REFERENCES $_tableAddress(id)
         )
       ''');
     await db.execute('''
           CREATE TABLE IF NOT EXISTS $_tableOwner(
           $_columnOwnerId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
           $_columnName TEXT NOT NULL,
-          $_columnPhone INTEGER NOT NULL,
-          $_columnAddress TEXT NOT NULL
+          $_columnPhone INTEGER NOT NULL
+        )
+      ''');
+    await db.execute('''
+          CREATE TABLE IF NOT EXISTS $_tableAddress(
+          $_columnAddressId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          $_columnDocking TEXT NOT NULL,
+          $_columnCity TEXT NOT NULL,
+          $_columnZipCode INTEGER NOT NULL,
+          $_columnGeo INTEGER NOT NULL
         )
       ''');
   }
