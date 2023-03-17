@@ -15,4 +15,7 @@ class OwnerEntity with _$OwnerEntity {
 
   factory OwnerEntity.fromJson(Map<String, dynamic> json) =>
       _$OwnerEntityFromJson(json);
+
+  factory OwnerEntity.empty() =>
+      const OwnerEntity(ownerId: OwnerId(value: 0), name: '', phone: '');
 }

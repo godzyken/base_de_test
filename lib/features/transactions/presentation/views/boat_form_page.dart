@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 extension on Boat {
@@ -17,15 +18,13 @@ extension on Boat {
   Boat get boatId => Boat(
       boatId: BoatId(value: id),
       name: name,
-      ownerEntity: ownerEntity,
-      addressId: addressEntity!.id,
-      addressEntity: addressEntity,
+      addressId: addressId,
       types: types,
       identityNumber: identityNumber,
       cnp: cnp,
       isAvailable: isAvailable,
       createdAt: createdAt,
-      ownerId: ownerEntity!.ownerId);
+      ownerId: ownerId);
 
   bool get isAvailable => boatId.isAvailable;
 }
@@ -46,8 +45,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   final List<int> _selectedItems = [];
   final _rentalDateFormFocusNode = _DisabledFocusNode();
 
-  final _dateTextEditingController = TextEditingController(
-      text: DateFormat('dd/MM/yyyy').format(DateTime.now()));
+  late TextEditingController _dateTextEditingController;
   final _nameEditingController = TextEditingController();
   final _ownerEditingController = TextEditingController();
   final _roleTextController = TextEditingController();
@@ -64,6 +62,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   final _statesController = MaterialStatesController();
   int oldLength = 0;
   int currentStep = 0;
+  int id = 0;
 
   _BoatFormPageState();
 
@@ -82,7 +81,6 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         _roleTextController.addListener(_printLatestBoatRoleValue);
         _cityTextController.addListener(_printLatestBoatRoleValue);
         _zipTextController.addListener(_printLatestBoatRoleValue);
-        _dateTextEditingController.addListener(_printLatestDateValue);
         _selectCategoryCnpController.addListener(() async {
           if (_selectCategoryCnpController.position.pixels >
               _selectCategoryCnpController.position.maxScrollExtent -
@@ -123,6 +121,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       }
     });
     _formViewModel = ref.read(boatFormViewModelProvider(widget.boat));
+    _dateTextEditingController = TextEditingController(
+        text: DateFormat('dd/MM/yyyy').format(DateTime.now()));
     super.initState();
   }
 
@@ -209,25 +209,25 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
   void onSavedOwnerName(value) {
     if (_formViewModel.setOwnerName(value) != null) {
-      ref.read(boatNotifierProvider.notifier).updateOwnerName(value);
+      ref.read(ownerEntityNotifierProvider.notifier).updateOwnerName(value);
     }
   }
 
   void onSavedCityName(value) {
     if (_formViewModel.setCityName(value) != null) {
-      ref.read(boatNotifierProvider.notifier).updateCityName(value);
+      ref.read(addressNotifierProvider.notifier).updateCity(value);
     }
   }
 
   void onSavedZipCode(value) {
     if (_formViewModel.setZipCode(value) != null) {
-      ref.read(boatNotifierProvider.notifier).updateZipCode(value);
+      ref.read(addressNotifierProvider.notifier).updateZipCode(value);
     }
   }
 
   void onSavedOwnerPhone(value) {
     if (_formViewModel.setOwnerPhone(value) != null) {
-      ref.read(boatNotifierProvider.notifier).updateOwnerPhone(value);
+      ref.read(ownerEntityNotifierProvider.notifier).updateOwnerPhone(value);
     }
   }
 
@@ -255,11 +255,22 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
   void _printLatestControllerValue() {
     log('print last start controller state: ${_statesController.value}');
-    log('lala');
-    int id = 0;
+
     ref.read(boatNotifierProvider.notifier).updateId(id);
-    _formViewModel.createOrUpdateBoat();
-    Navigator.pop(context);
+    // Navigator.pop(context, true);
+    context.go('/boat-list');
+  }
+
+  void _onCreateBoat() {
+    log('lulu');
+    final currentState = _formKey.currentState;
+    if (boat != null && currentState!.validate()) {
+      log('lala');
+      ref.read(boatFormStateNotifierProvider.notifier).addBoat(boat!);
+      context.go('boat-list');
+    }
+    log('lolo');
+    return;
   }
 
   @override
@@ -309,17 +320,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       width: double.infinity,
       child: ElevatedButton(
         statesController: _statesController,
-        onPressed: () {
-          log('lulu');
-          final currentState = _formKey.currentState;
-          if (currentState != null && currentState.validate()) {
-            log('lala');
-            _formViewModel.createOrUpdateBoat();
-            Navigator.pop(context);
-          }
-          log('lolo');
-          return;
-        },
+        onPressed: _onCreateBoat,
         child: const Text('Save'),
       ),
     );
@@ -335,79 +336,58 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
           content: Wrap(
             children: [
               _buildBoatNameFormWidget(context),
+              const SizedBox(
+                height: 10,
+              ),
+              _buildTypesOfBoatFormWidget(context),
+              const SizedBox(
+                height: 10,
+              ),
+              _buildCategoryOfBoatFormWidget(context),
+              const SizedBox(
+                height: 10,
+              ),
+              _buildIdentityNumberOfBoatFormWidget(context),
+              const SizedBox(
+                height: 10,
+              ),
+              _buildBoatRoleFormWidget(context),
+              const SizedBox(
+                height: 10,
+              ),
+              _buildRentalDateFormWidget(context),
             ],
           ),
         ),
         Step(
           state: currentStep > 1 ? StepState.complete : StepState.indexed,
           isActive: currentStep >= 1,
-          title: const Text("Types"),
+          title: const Text("Owner contact"),
           content: Wrap(
             children: [
-              _buildTypesOfBoatFormWidget(context),
+              _buildOwnerNameFormWidget(context),
+              const SizedBox(
+                height: 10,
+              ),
+              _buildOwnerPhoneFormWidget(context),
             ],
           ),
         ),
         Step(
           state: currentStep > 2 ? StepState.complete : StepState.indexed,
           isActive: currentStep >= 2,
-          title: const Text("Category"),
-          content: Wrap(
-            children: [
-              _buildCategoryOfBoatFormWidget(context),
-            ],
-          ),
-        ),
-        Step(
-          state: currentStep > 3 ? StepState.complete : StepState.indexed,
-          isActive: currentStep >= 3,
-          title: const Text("Identity Number"),
-          content: Wrap(
-            children: [
-              _buildIdentityNumberOfBoatFormWidget(context),
-            ],
-          ),
-        ),
-        Step(
-          state: currentStep > 4 ? StepState.complete : StepState.indexed,
-          isActive: currentStep >= 4,
-          title: const Text("Service"),
-          content: Wrap(
-            children: [
-              _buildBoatRoleFormWidget(context),
-            ],
-          ),
-        ),
-        Step(
-          state: currentStep > 5 ? StepState.complete : StepState.indexed,
-          isActive: currentStep >= 5,
-          title: const Text("Owner contact"),
-          content: Wrap(
-            children: [
-              _buildOwnerNameFormWidget(context),
-              _buildOwnerPhoneFormWidget(context),
-            ],
-          ),
-        ),
-        Step(
-          state: currentStep > 6 ? StepState.complete : StepState.indexed,
-          isActive: currentStep >= 6,
           title: const Text("Location"),
           content: Wrap(
             children: [
               _buildBoatDockingFormWidget(context),
+              const SizedBox(
+                height: 10,
+              ),
               _buildCityFormWidget(context),
+              const SizedBox(
+                height: 10,
+              ),
               _buildZipCodeFormWidget(context),
-            ],
-          ),
-        ),
-        Step(
-          state: currentStep > 7 ? StepState.complete : StepState.indexed,
-          isActive: currentStep >= 7,
-          title: const Text("Rental"),
-          content: Wrap(
-            children: [
-              _buildRentalDateFormWidget(context),
             ],
           ),
         ),
@@ -453,6 +433,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       controller: _nameEditingController,
       maxLength: 20,
       onFieldSubmitted: onSavedName,
+      onChanged: (value) => _formViewModel.setName(value),
       validator: (value) => _formViewModel.validateName(value!),
       decoration: const InputDecoration(
         icon: Icon(Icons.edit),
@@ -744,8 +725,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
           itemBuilder: (BuildContext context, int index) => ListTile(
             onTap: () {
               ref
-                  .read(boatNotifierProvider.notifier)
-                  .updateDockingTypeValue(docking[index].name);
+                  .read(dockingNotifierProvider.notifier)
+                  .selectDockingType(docking[index]);
             },
             title: Text(
               docking[index].name,

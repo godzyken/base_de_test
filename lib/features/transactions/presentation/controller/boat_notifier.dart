@@ -7,31 +7,12 @@ class BoatNotifier extends StateNotifier<Boat> {
   BoatNotifier(super.state);
 
   void updateId(int id) {
-    final count = id + 1 + DateTime.now().millisecondsSinceEpoch;
+    var count = id + 1 + DateTime.now().millisecondsSinceEpoch;
     state = state.copyWith.boatId!(value: count);
   }
 
   void updateName(String n) {
     state = state.copyWith(name: n);
-  }
-
-  void updateOwnerName(String o) {
-    state = state.copyWith.ownerEntity!(name: o);
-    int id = 2 + DateTime.now().millisecondsSinceEpoch;
-    state = state.copyWith.ownerId!(value: id);
-    state = state.copyWith.ownerEntity!.ownerId(value: id);
-  }
-
-  void updateCityName(String n) {
-    state =
-        state.copyWith(addressEntity: state.addressEntity?.copyWith(city: n));
-    int id = 3 + DateTime.now().millisecondsSinceEpoch;
-    state = state.copyWith(addressId: state.addressId?.copyWith(value: id));
-    state = state.copyWith.addressEntity!.id!(value: id);
-  }
-
-  void updateOwnerPhone(String p) {
-    state = state.copyWith(ownerEntity: state.ownerEntity?.copyWith(phone: p));
   }
 
   void updateRole(String r) {
@@ -68,17 +49,6 @@ class BoatNotifier extends StateNotifier<Boat> {
 
   void updateIsAvailableValue(bool b) {
     state = state.copyWith(isAvailable: b, isChecked: b);
-  }
-
-  void updateDockingTypeValue(String d) {
-    state = state.copyWith(
-        addressEntity:
-            state.addressEntity?.copyWith(docking: Docking.values.byName(d)));
-  }
-
-  void updateZipCode(String z) {
-    state = state.copyWith(
-        addressEntity: state.addressEntity?.copyWith(zipcode: z));
   }
 }
 
@@ -137,8 +107,7 @@ class OwnerEntityNotifier extends StateNotifier<OwnerEntity> {
   OwnerEntityNotifier(super.state);
 
   void updateOwnerId(int i) {
-    final count = i + 1 + DateTime.now().millisecondsSinceEpoch;
-    state = state.copyWith.ownerId(value: count);
+    state = state.copyWith.ownerId(value: i);
   }
 
   void updateOwnerName(String n) {
@@ -152,6 +121,10 @@ class OwnerEntityNotifier extends StateNotifier<OwnerEntity> {
 
 class AddressNotifier extends StateNotifier<AddressEntity> {
   AddressNotifier(super.state);
+
+  void updateAddressId(int i) {
+    state = state.copyWith.id!(value: i);
+  }
 
   void updateCity(String c) {
     state = state.copyWith(city: c);
@@ -226,7 +199,8 @@ class IdentityNumberNotifier extends StateNotifier<List<IdentityNumber>> {
 
 class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
   BoatFormStateNotifier(this._repository)
-      : super(FormBoatAddState(Boat.empty()));
+      : super(FormBoatAddState(
+            Boat.empty(), OwnerEntity.empty(), AddressEntity.empty()));
 
   final BoatsRepository _repository;
 
@@ -239,9 +213,10 @@ class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
   }
 
   void addBoat(Boat b) async {
-    Boat form = state.form.copyWith(
+    Boat form = state.boat.copyWith(
         boatId: b.boatId,
-        ownerEntity: b.ownerEntity,
+        ownerId: b.ownerId,
+        addressId: b.addressId,
         name: b.name,
         identityNumber: b.identityNumber,
         createdAt: b.createdAt,
@@ -262,7 +237,7 @@ class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
       boat = form.copyWith(isAvailable: false);
     }
 
-    state = state.copyWith(form: form.copyWith(boatId: boat.boatId));
+    state = state.copyWith(boat: form.copyWith(boatId: boat.boatId));
   }
 
   @override
@@ -277,15 +252,7 @@ final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) =>
     BoatNotifier(Boat(
         boatId: const BoatId(value: 0),
         name: 'name',
-        ownerEntity: const OwnerEntity(
-            ownerId: OwnerId(value: 0), name: 'name', phone: 'phone'),
         addressId: const AddressId(value: 0),
-        addressEntity: const AddressEntity(
-            id: AddressId(value: 0),
-            docking: Docking.anchoring,
-            city: 'city',
-            zipcode: 'zip_code',
-            geo: GeoEntity()),
         types: TypesOfBoat.yacht,
         identityNumber: IdentityNumber.cin,
         cnp: CategoriesCNP.c,
@@ -331,9 +298,9 @@ final geoNotifierProvider = StateNotifierProvider<GeoNotifier, GeoEntity>(
 final boatFormStateNotifierProvider =
     StateNotifierProvider<BoatFormStateNotifier, FormBoatAddState>((ref) {
   final form = ref.notifier;
-  final boatNotifier = ref.refresh(boatNotifierProvider.notifier);
-
-  form.addListener((state) {});
+  final boat = ref.refresh(boatNotifierProvider);
+  final owner = ref.refresh(ownerEntityNotifierProvider);
+  final address = ref.refresh(addressNotifierProvider);
 
   return form;
 });

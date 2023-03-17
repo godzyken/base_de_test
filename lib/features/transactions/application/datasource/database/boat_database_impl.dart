@@ -32,56 +32,11 @@ class BoatDatabaseImpl implements SourceBase {
   static Database? _database;
 
   Future<Database> get database async {
+    await Sqflite.getDebugModeOn();
+    await Sqflite.setDebugModeOn(true);
+
     _database ??= await _initDatabase();
     return _database!;
-  }
-
-  @override
-  Future<BoatListEntity> allBoats() async {
-    final db = await database;
-    return db.query(_tableName);
-  }
-
-  @override
-  Future<void> deleteBoat(final int id) async {
-    final db = await database;
-    await db.delete(
-      _tableName,
-      where: '$_columnId = ?',
-      whereArgs: [id],
-    );
-  }
-
-  @override
-  Future<BoatEntity> insertBoat(final BoatEntity boat) async {
-    final db = await database;
-    late final BoatEntity boatEntity;
-    await db.transaction((txn) async {
-      final id = await txn.insert(
-        _tableName,
-        boat,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-      final results = await txn.query(
-        _tableName,
-        where: '$_columnId = ?',
-        whereArgs: [id],
-      );
-      boatEntity = results.first;
-    });
-    return boatEntity;
-  }
-
-  @override
-  Future<void> updateBoat(final BoatEntity boatEntity) async {
-    final db = await database;
-    final int id = boatEntity['id'];
-    await db.update(
-      _tableName,
-      boatEntity,
-      where: '$_columnId = ?',
-      whereArgs: [id],
-    );
   }
 
   Future<Database> _initDatabase() async {
@@ -150,6 +105,146 @@ class BoatDatabaseImpl implements SourceBase {
 
   static void _onOpen(Database db) async {
     log('database version: ${await db.getVersion()}');
+  }
+
+  @override
+  Future<BoatListEntity> allBoats() async {
+    final db = await database;
+    return db.query(_tableName);
+  }
+
+  @override
+  Future<int> deleteAllBoat() async {
+    final db = await database;
+    final res = await db.rawDelete(_tableName);
+    log('result: $res');
+    return res;
+  }
+
+  @override
+  Future<AddressEntity> insertAddress(final AddressEntity address) async {
+    final db = await database;
+    late final AddressEntity addressEntity;
+    await db.transaction((txn) async {
+      final id = await txn.insert(
+        _tableAddress,
+        address,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      final results = await txn.query(
+        _tableAddress,
+        where: '$_columnAddressId = ?',
+        whereArgs: [id],
+      );
+      addressEntity = results.first;
+    });
+    return addressEntity;
+  }
+
+  @override
+  Future<BoatEntity> insertBoat(final BoatEntity boat) async {
+    final db = await database;
+    late final BoatEntity boatEntity;
+    await db.transaction((txn) async {
+      final id = await txn.insert(
+        _tableName,
+        boat,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      final results = await txn.query(
+        _tableName,
+        where: '$_columnId = ?',
+        whereArgs: [id],
+      );
+      boatEntity = results.first;
+    });
+    return boatEntity;
+  }
+
+  @override
+  Future<OwnerEntity> insertOwner(final OwnerEntity owner) async {
+    final db = await database;
+    late final OwnerEntity ownerEntity;
+    await db.transaction((txn) async {
+      final id = await txn.insert(
+        _tableOwner,
+        owner,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      final results = await txn.query(
+        _tableOwner,
+        where: '$_columnOwnerId = ?',
+        whereArgs: [id],
+      );
+      ownerEntity = results.first;
+    });
+    return ownerEntity;
+  }
+
+  @override
+  Future<void> updateAddress(final AddressEntity addressEntity) async {
+    final db = await database;
+    final int id = addressEntity['id'];
+    await db.update(
+      _tableAddress,
+      addressEntity,
+      where: '$_columnAddressId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<void> updateBoat(final BoatEntity boatEntity) async {
+    final db = await database;
+    final int id = boatEntity['id'];
+    await db.update(
+      _tableName,
+      boatEntity,
+      where: '$_columnId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<void> updateOwner(final OwnerEntity ownerEntity) async {
+    final db = await database;
+    final int id = ownerEntity['id'];
+    await db.update(
+      _tableOwner,
+      ownerEntity,
+      where: '$_columnOwnerId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<int> deleteAddress(final int id) async {
+    final db = await database;
+    return await db.delete(
+      _tableAddress,
+      where: '$_columnAddressId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<int> deleteBoat(final int id) async {
+    final db = await database;
+    return await db.delete(
+      _tableName,
+      where: '$_columnId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<int> deleteOwner(final int id) async {
+    final db = await database;
+    return await db.delete(
+      _tableOwner,
+      where: '$_columnOwnerId = ?',
+      whereArgs: [id],
+    );
   }
 
   @override

@@ -15,7 +15,6 @@ class AddBoatFormViewModel {
   late AddressId _addressId;
 
   var _name = '';
-  var _boatIdentity = IdentityNumber.values;
   OwnerEntity? _owner;
   AddressEntity? _address;
   var _ownerName = '';
@@ -23,8 +22,10 @@ class AddBoatFormViewModel {
   var _zipCode = '';
   var _ownerPhone = '';
   var _isAvailable = false;
+  var _boatIdentity = IdentityNumber.values;
   var _types = TypesOfBoat.values;
   var _cnp = CategoriesCNP.values;
+  var _docking = Docking.values;
   final DateTime _initDate = DateTime.now();
   final DateTime _removeDate = DateTime.now();
   final DateTime _minimal = DateTime(DateTime.now().year);
@@ -45,11 +46,10 @@ class AddBoatFormViewModel {
       _name = boat.name;
       _ownerId = boat.ownerId!;
       _addressId = boat.addressId!;
-      _address = boat.addressEntity!;
       _boatIdentity = [];
       _types = [];
       _cnp = [];
-      _owner = boat.ownerEntity;
+      _docking = [];
       _isAvailable = boat.isAvailable;
       _raison = boat.role!;
     }
@@ -66,9 +66,7 @@ class AddBoatFormViewModel {
         _name,
         _ownerId,
         _isAvailable,
-        _owner!,
         _addressId,
-        _address!,
         _boatIdentity.first,
         _types.first,
         _cnp.first,
@@ -82,9 +80,7 @@ class AddBoatFormViewModel {
       final oldBoat = Boat(
         boatId: _id,
         name: _name,
-        ownerEntity: _owner,
         addressId: _addressId,
-        addressEntity: _address,
         types: _types.first,
         identityNumber: _boatIdentity.first,
         cnp: _cnp.first,
@@ -108,6 +104,8 @@ class AddBoatFormViewModel {
 
   String initialBoatNameValue() => _name;
   String initialOwnerNameValue() => _ownerName;
+  String initialCityNameValue() => _cityName;
+  String initialZipCodeValue() => _zipCode;
   String initialOwnerPhoneValue() => _ownerPhone;
   OwnerId initializeOwnerId() => _ownerId;
   AddressId initializeAddressId() => _addressId;
@@ -116,6 +114,7 @@ class AddBoatFormViewModel {
   bool initialAvailableValue() => _isAvailable;
   List<TypesOfBoat> initialTypesOfBoatValue() => _types;
   List<CategoriesCNP> initialCnpValue() => _cnp;
+  List<Docking> initialDockingValue() => _docking;
   DateTime initialCreatedDateValue() => _initDate;
   DateTime datePickerFirstDate() => _minimal;
   DateTime datePickerLastDate() => _maximal;
@@ -129,12 +128,6 @@ class AddBoatFormViewModel {
   setCityName(final String value) => _cityName = value;
   setZipCode(final String value) => _zipCode = value;
   setOwnerPhone(final String value) => _ownerPhone = value;
-  setOwnerId(final int value) => _ownerId.copyWith(value: value).value;
-
-  setAddressId(final int value) {
-    var i = value + 3 + DateTime.now().millisecondsSinceEpoch;
-    _addressId.copyWith(value: i).value;
-  }
 
   setBoatIdentity(final List<IdentityNumber> value) => _boatIdentity = value;
   setTypesBoat(final List<TypesOfBoat> value) {
@@ -144,10 +137,21 @@ class AddBoatFormViewModel {
     }
   }
 
-  setIsAvailable(final bool value) => _isAvailable = value;
+  setDocking(final List<Docking> value) {
+    if (_docking.isNotEmpty) {
+      _docking.contains(value.single);
+      return value;
+    }
+  }
+
   setCategoryCnp(final List<CategoriesCNP> value) => _cnp = value;
+
   setStartLocation(final DateTime value) => _initDateTimeRange.start;
   setStopLocation(final DateTime value) => _initDateTimeRange.end;
+  setIsAvailable(final bool value) => _isAvailable = value;
+
+  setAddressId(final int value) => _addressId.copyWith(value: value);
+  setOwnerId(final int value) => _ownerId.copyWith(value: value);
 
   even(final DateTimeRange dateTimeRange, initialAvailableValue) {
     if (setStartLocation(dateTimeRange.start)) {
@@ -229,9 +233,7 @@ final boatListFutureProvider = FutureProvider.autoDispose
       filter._name,
       filter._ownerId,
       filter._isAvailable,
-      filter._owner!,
       filter._addressId,
-      filter._address!,
       filter._boatIdentity.first,
       filter._types.first,
       filter._cnp.first,

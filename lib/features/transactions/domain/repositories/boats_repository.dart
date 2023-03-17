@@ -6,9 +6,7 @@ abstract class BoatsRepository {
   Future<Boat> createBoat(
       final String name,
       final OwnerId ownerId,
-      final OwnerEntity owner,
       final AddressId addressId,
-      final AddressEntity address,
       final TypesOfBoat types,
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
@@ -22,9 +20,7 @@ abstract class BoatsRepository {
       final BoatId id,
       final String name,
       final OwnerId ownerId,
-      final OwnerEntity owner,
       final AddressId addressId,
-      final AddressEntity address,
       final TypesOfBoat types,
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
@@ -34,6 +30,7 @@ abstract class BoatsRepository {
       final DateTime? rentedAt,
       final DateTime? returnedAt,
       final String? role);
-  Future<void> deleteBoat(final BoatId id);
+  Future<int> deleteBoat(final BoatId id);
+  Future<int> deleteAllBoat();
   Future<void> closeDatabase();
 }

@@ -13,9 +13,7 @@ class BoatsRepositoryImpl implements BoatsRepository {
   Future<Boat> createBoat(
       final String name,
       final OwnerId ownerId,
-      final OwnerEntity owner,
       final AddressId addressId,
-      final AddressEntity address,
       final TypesOfBoat types,
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
@@ -29,9 +27,7 @@ class BoatsRepositoryImpl implements BoatsRepository {
         await database.insertBoat(BoatMapper.transformToNewEntityMap(
       name,
       ownerId,
-      owner,
       addressId,
-      address,
       cnp,
       identityNumber,
       isAvailable,
@@ -47,8 +43,8 @@ class BoatsRepositoryImpl implements BoatsRepository {
   }
 
   @override
-  Future<void> deleteBoat(final BoatId id) async {
-    await database.deleteBoat(id.value);
+  Future<int> deleteBoat(final BoatId id) async {
+    return await database.deleteBoat(id.value);
   }
 
   @override
@@ -62,9 +58,7 @@ class BoatsRepositoryImpl implements BoatsRepository {
       final BoatId id,
       final String name,
       final OwnerId ownerId,
-      final OwnerEntity owner,
       final AddressId addressId,
-      final AddressEntity address,
       final TypesOfBoat types,
       final IdentityNumber identityNumber,
       final CategoriesCNP cnp,
@@ -77,9 +71,7 @@ class BoatsRepositoryImpl implements BoatsRepository {
     final boat = Boat(
       boatId: id,
       name: name,
-      ownerEntity: owner,
       addressId: addressId,
-      addressEntity: address,
       types: types,
       identityNumber: identityNumber,
       cnp: cnp,
@@ -104,5 +96,10 @@ class BoatsRepositoryImpl implements BoatsRepository {
   @override
   Future<void> closeDatabase() async {
     await database.close();
+  }
+
+  @override
+  Future<int> deleteAllBoat() async {
+    return await database.deleteAllBoat();
   }
 }

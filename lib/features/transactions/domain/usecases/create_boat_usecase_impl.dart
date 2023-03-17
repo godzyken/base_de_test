@@ -12,9 +12,7 @@ class CreateBoatLocationCaseImpl implements CreateBoatLocationCase {
   Future<Boat> execute(
     final String name,
     final OwnerId ownerId,
-    final OwnerEntity ownerEntity,
     final AddressId addressId,
-    final AddressEntity addressEntity,
     final IdentityNumber identityNumber,
     final TypesOfBoat types,
     final CategoriesCNP cnp,
@@ -28,9 +26,7 @@ class CreateBoatLocationCaseImpl implements CreateBoatLocationCase {
     return _repository.createBoat(
       name,
       ownerId,
-      ownerEntity,
       addressId,
-      addressEntity,
       types,
       identityNumber,
       cnp,

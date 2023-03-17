@@ -18,6 +18,13 @@ class AddressEntity with _$AddressEntity {
 
   factory AddressEntity.fromJson(Map<String, dynamic> json) =>
       _$AddressEntityFromJson(json);
+
+  factory AddressEntity.empty() => const AddressEntity(
+      id: AddressId(value: 0),
+      docking: Docking.anchoring,
+      zipcode: '',
+      city: '',
+      geo: GeoEntity());
 }
 
 @JsonEnum()

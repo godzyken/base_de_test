@@ -53,8 +53,8 @@ class TransactionProvider {
 
   Future<Boat> save(Boat boatEntity) async {
     final db = await instance.db;
-    final id = await db
-        .rawInsert(sqlInsert, [boatEntity.name, boatEntity.ownerEntity]);
+    final id =
+        await db.rawInsert(sqlInsert, [boatEntity.name, boatEntity.ownerId]);
 
     log('$id');
     return boatEntity.copyWith(boatId: BoatId(value: id));

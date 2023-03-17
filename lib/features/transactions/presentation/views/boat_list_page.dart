@@ -91,7 +91,7 @@ class BoatListPage extends ConsumerWidget {
                     height: 4,
                   ),
                   Text(
-                    boat.ownerEntity!.name,
+                    boat.types.name,
                     style: context.textTheme.displaySmall,
                     overflow: TextOverflow.ellipsis,
                   ),
