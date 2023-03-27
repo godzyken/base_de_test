@@ -15,7 +15,7 @@ class AuthStateController extends StateNotifier<ss.AuthState> {
   }
 
   final AuthRepository _authRepository;
-  late final StreamSubscription _streamSubscription;
+  late final StreamSubscription<AuthUser?> _streamSubscription;
 
   ss.AuthStatus? validator(AuthUser? value) {
     if (value!.id.isEmpty) {

@@ -15,7 +15,7 @@ import 'package:base_de_test/features/common/domain/failures/failure.dart'
     as _i8;
 import 'package:fpdart/fpdart.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:supabase_flutter/supabase_flutter.dart' as _i3;
+import 'package:supabase/supabase.dart' as _i3;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -271,6 +271,30 @@ class MockAuthRepository extends _i1.Mock implements _i5.AuthRepository {
           this,
           Invocation.method(
             #signOut,
+            [],
+          ),
+        )),
+      ) as _i7.Future<_i4.Either<_i8.Failure, bool>>);
+  @override
+  _i7.Future<_i4.Either<_i8.Failure, bool>> isOnLine() => (super.noSuchMethod(
+        Invocation.method(
+          #isOnLine,
+          [],
+        ),
+        returnValue: _i7.Future<_i4.Either<_i8.Failure, bool>>.value(
+            _FakeEither_2<_i8.Failure, bool>(
+          this,
+          Invocation.method(
+            #isOnLine,
+            [],
+          ),
+        )),
+        returnValueForMissingStub:
+            _i7.Future<_i4.Either<_i8.Failure, bool>>.value(
+                _FakeEither_2<_i8.Failure, bool>(
+          this,
+          Invocation.method(
+            #isOnLine,
             [],
           ),
         )),

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as developer;
 
 import 'package:base_de_test/features/auth/auth_provider.dart';
 import 'package:base_de_test/features/auth/infrastructure/repositories/auth_repository.dart';
@@ -58,7 +58,8 @@ class AuthController extends StateNotifier<UserEntity?> {
       state = res.fold((l) => null, (r) => r);
       _updateAuthState();
     } on PlatformException catch (e) {
-      log(e.code);
+      developer.log('PlatformException: ${e.code}',
+          error: e.code, name: e.details);
     }
   }
 

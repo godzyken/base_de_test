@@ -11,11 +11,17 @@ class OwnerEntity with _$OwnerEntity {
   const factory OwnerEntity(
       {required OwnerId ownerId,
       required String name,
-      required String phone}) = _OwnerEntity;
+      required String phone,
+      @Default(false) bool isValid}) = _OwnerEntity;
+
+  const OwnerEntity._();
+
+  OwnerEntity available() => copyWith(isValid: true);
+  OwnerEntity unavailable() => copyWith(isValid: false);
 
   factory OwnerEntity.fromJson(Map<String, dynamic> json) =>
       _$OwnerEntityFromJson(json);
 
-  factory OwnerEntity.empty() =>
-      const OwnerEntity(ownerId: OwnerId(value: 0), name: '', phone: '');
+  factory OwnerEntity.empty() => const OwnerEntity(
+      ownerId: OwnerId(value: 0), name: '', phone: '', isValid: false ?? true);
 }

@@ -6,7 +6,8 @@ class OwnerMapper {
     return OwnerEntity(
         ownerId: OwnerId(value: entity['id']),
         name: entity['name'],
-        phone: entity['phone']);
+        phone: entity['phone'],
+        isValid: entity['is_valid'] == 1);
   }
 
   static s.OwnerEntity transformToMap(final OwnerEntity model) {
@@ -14,15 +15,17 @@ class OwnerMapper {
       'ownerId': model.ownerId.value,
       'name': model.name,
       'phone': model.phone,
+      'is_valid': model.isValid ? 1 : 0,
     };
   }
 
   static s.OwnerEntity transformToNewEntityMap(
-      final String name, final String phone) {
+      final String name, final String phone, bool isValid) {
     return {
       'id': null,
       'name': name,
       'phone': phone,
+      'is_valid': isValid ? 1 : 0,
     };
   }
 }

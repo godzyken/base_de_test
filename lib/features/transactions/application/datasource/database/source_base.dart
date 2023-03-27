@@ -2,6 +2,8 @@ import 'package:base_de_test/features/transactions/application/datasource/entity
 
 abstract class SourceBase {
   Future<BoatListEntity> allBoats();
+  Future<OwnerListEntity> allOwners();
+  Future<AddressListEntity> allAddress();
   Future<BoatEntity> insertBoat(final BoatEntity boatEntity);
   Future<OwnerEntity> insertOwner(final OwnerEntity ownerEntity);
   Future<AddressEntity> insertAddress(final AddressEntity addressEntity);

@@ -7,6 +7,7 @@ import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 
 class BoatDatabaseImpl implements SourceBase {
+  static final BoatDatabaseImpl instance = BoatDatabaseImpl._init();
   static const _databaseName = 'boats_database';
   static const _tableName = 'boats_table';
   static const _tableOwner = 'owner_table';
@@ -30,6 +31,8 @@ class BoatDatabaseImpl implements SourceBase {
   static const _columnZipCode = 'zip_code';
   static const _columnGeo = 'geo';
   static Database? _database;
+
+  BoatDatabaseImpl._init();
 
   Future<Database> get database async {
     await Sqflite.getDebugModeOn();
@@ -84,7 +87,8 @@ class BoatDatabaseImpl implements SourceBase {
           CREATE TABLE IF NOT EXISTS $_tableOwner(
           $_columnOwnerId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
           $_columnName TEXT NOT NULL,
-          $_columnPhone INTEGER NOT NULL
+          $_columnPhone INTEGER NOT NULL,
+          $_columnAvailable BOOLEAN NOT NULL
         )
       ''');
     await db.execute('''
@@ -111,6 +115,18 @@ class BoatDatabaseImpl implements SourceBase {
   Future<BoatListEntity> allBoats() async {
     final db = await database;
     return db.query(_tableName);
+  }
+
+  @override
+  Future<OwnerListEntity> allOwners() async {
+    final db = await database;
+    return db.query(_tableOwner);
+  }
+
+  @override
+  Future<AddressListEntity> allAddress() async {
+    final db = await database;
+    return db.query(_tableAddress);
   }
 
   @override

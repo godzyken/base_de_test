@@ -14,7 +14,7 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
-  // This widget is the root of your application.
+  // This widgehe root of yout is tr application.
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(goRouterProvider);
@@ -26,6 +26,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       routeInformationProvider: router.routeInformationProvider,
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
+      showPerformanceOverlay: true,
     );
   }
 }

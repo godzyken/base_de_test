@@ -1,4 +1,7 @@
+import 'package:base_de_test/features/transactions/domain/entities/address_properties/docking.dart';
+import 'package:base_de_test/features/transactions/domain/entities/boat_properties/boat_name.dart';
 import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
+import 'package:base_de_test/features/transactions/domain/entities/owner_properties/owner_name.dart';
 import 'package:base_de_test/features/transactions/domain/repositories/boats_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
@@ -55,6 +58,11 @@ class BoatNotifier extends StateNotifier<Boat> {
 class TypesOfBoatNotifier extends StateNotifier<List<TypesOfBoat>> {
   TypesOfBoatNotifier(super.state);
 
+  void addTypes(TypesOfBoat typesOfBoat) => state = [...state, typesOfBoat];
+
+  void removeTypes(TypesOfBoat typesOfBoat) =>
+      state = [...state..remove(typesOfBoat)];
+
   String? selectTypes(TypesOfBoat typesOfBoat) {
     switch (typesOfBoat) {
       case TypesOfBoat.barge:
@@ -99,6 +107,9 @@ class CategoryCnpNotifier extends StateNotifier<List<CategoriesCNP>> {
       case CategoriesCNP.d:
         cat = CategoriesCNP.d;
         return cat.name;
+      case CategoriesCNP.unknown:
+        cat = CategoriesCNP.unknown;
+        return cat.name;
     }
   }
 }
@@ -107,7 +118,8 @@ class OwnerEntityNotifier extends StateNotifier<OwnerEntity> {
   OwnerEntityNotifier(super.state);
 
   void updateOwnerId(int i) {
-    state = state.copyWith.ownerId(value: i);
+    var count = i + 2 + DateTime.now().millisecondsSinceEpoch;
+    state = state.copyWith.ownerId(value: count);
   }
 
   void updateOwnerName(String n) {
@@ -123,7 +135,8 @@ class AddressNotifier extends StateNotifier<AddressEntity> {
   AddressNotifier(super.state);
 
   void updateAddressId(int i) {
-    state = state.copyWith.id!(value: i);
+    var count = i + 3 + DateTime.now().millisecondsSinceEpoch;
+    state = state.copyWith.id!(value: count);
   }
 
   void updateCity(String c) {
@@ -240,6 +253,43 @@ class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
     state = state.copyWith(boat: form.copyWith(boatId: boat.boatId));
   }
 
+  void addOwner(OwnerEntity o) async {
+    OwnerEntity form = state.ownerEntity.copyWith(
+        ownerId: o.ownerId, name: o.name, phone: o.phone, isValid: o.isValid);
+
+    late OwnerEntity ownerEntity;
+
+    if (form.isValid) {
+      ownerEntity = form.copyWith(isValid: true);
+    } else {
+      ownerEntity = form.copyWith(isValid: false);
+    }
+
+    state = state.copyWith(
+        ownerEntity: form.copyWith(ownerId: ownerEntity.ownerId));
+  }
+
+  void addAddress(AddressEntity a) async {
+    AddressEntity form = state.addressEntity.copyWith(
+        id: a.id,
+        docking: a.docking,
+        zipcode: a.zipcode,
+        city: a.city,
+        geo: a.geo);
+
+    late AddressEntity addressEntity;
+
+    if (form.docking.name.isNotEmpty) {
+      addressEntity = form.copyWith(
+        docking: a.docking,
+      );
+    } else {
+      addressEntity = form.copyWith(docking: Docking.anchoring);
+    }
+
+    state = state.copyWith(addressEntity: form.copyWith(id: addressEntity.id));
+  }
+
   @override
   void dispose() {
     _repository.closeDatabase();
@@ -253,9 +303,9 @@ final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) =>
         boatId: const BoatId(value: 0),
         name: 'name',
         addressId: const AddressId(value: 0),
-        types: TypesOfBoat.yacht,
-        identityNumber: IdentityNumber.cin,
-        cnp: CategoriesCNP.c,
+        types: TypesOfBoat.unknown,
+        identityNumber: IdentityNumber.unknown,
+        cnp: CategoriesCNP.unknown,
         createdAt: DateTime.now(),
         isAvailable: false,
         ownerId: const OwnerId(value: 0))));
@@ -273,7 +323,8 @@ final ownerEntityNotifierProvider =
         OwnerEntityNotifier(const OwnerEntity(
             ownerId: OwnerId(value: 0),
             name: 'ownerName',
-            phone: 'ownerPhone')));
+            phone: 'ownerPhone',
+            isValid: false)));
 
 final addressNotifierProvider =
     StateNotifierProvider<AddressNotifier, AddressEntity>((_) =>
@@ -302,5 +353,25 @@ final boatFormStateNotifierProvider =
   final owner = ref.refresh(ownerEntityNotifierProvider);
   final address = ref.refresh(addressNotifierProvider);
 
-  return form;
+  form.addBoat(boat);
+  form.addOwner(owner);
+  form.addAddress(address);
+
+  FormBoatAddState(boat, owner, address,
+      formAddressAddState: const FormAddressAddState(
+          cityNameFormz: CityNameFormz.pure(),
+          zipCodeFormz: ZipCodeFormz.pure(),
+          dockingFormz: DockingFormz.pure(),
+          status: FormzSubmissionStatus.initial),
+      formOwnerAddState: const FormOwnerAddState(
+        status: FormzSubmissionStatus.initial,
+        formAddressAddState: FormAddressAddState(),
+        ownerNameFormz: OwnerNameFormz.pure(),
+        ownerPhoneFormz: OwnerPhoneFormz.pure(),
+      ),
+      boatNameFormz: const BoatNameFormz.pure(),
+      boatRoleFormz: const BoatRoleFormz.pure(),
+      status: FormzSubmissionStatus.initial);
+
+  return BoatFormStateNotifier(form._repository);
 });

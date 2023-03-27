@@ -24,4 +24,6 @@ abstract class AuthRepositoryInterface {
     String? email,
     String? password,
   );
+
+  Future<Either<Failure, bool>> isOnLine();
 }

@@ -1,10 +1,11 @@
-import 'dart:developer';
+import 'dart:developer' as developer;
 
 import 'package:base_de_test/features/auth/domain/entities/user/user_entity.dart';
 import 'package:base_de_test/features/auth/domain/repositories/auth_repository_interface.dart';
 import 'package:base_de_test/features/auth/infrastructure/datasources/local/auth_token_local_data_source.dart';
 import 'package:base_de_test/features/common/domain/failures/failure.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:supabase/supabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class AuthRepository implements AuthRepositoryInterface {
@@ -121,7 +122,7 @@ class AuthRepository implements AuthRepositoryInterface {
     String? email,
     String? password,
   ) async {
-    log('signInWithPassword()');
+    developer.log('signInWithPassword()');
     final res = await authClient.signInWithPassword(
       email: email,
       password: password!,
@@ -142,13 +143,14 @@ class AuthRepository implements AuthRepositoryInterface {
 
   @override
   Future<Either<Failure, bool>> signInWithGoogle() async {
-    log('signInWithGoogle()');
     final res = await authClient.signInWithOAuth(
       supabase.Provider.google,
     );
     if (!res) {
+      developer.log('signInWithGoogle() error: $res');
       return left(Failure.badRequest());
     }
+    developer.log('signInWithGoogle() success: $res');
     return right(true);
   }
 
@@ -163,5 +165,36 @@ class AuthRepository implements AuthRepositoryInterface {
       return left(Failure.badRequest());
     }
     return right(true);
+  }
+
+  @override
+  Future<Either<Failure, bool>> isOnLine() async {
+    final myChannel = supabase.Supabase.instance.client.channel('base_de_test');
+
+    if (myChannel.isClosed) return left(Failure.unauthorized());
+    if (myChannel.isErrored) return left(Failure.unauthorized());
+    if (myChannel.isLeaving) return left(Failure.unauthorized());
+
+    if (myChannel.isJoining) {
+      myChannel
+          .on(RealtimeListenTypes.presence, ChannelFilter(event: 'sync'),
+              (payload, [ref]) {
+            final onlineUsers = myChannel.presenceState();
+          })
+          .on(RealtimeListenTypes.presence, ChannelFilter(event: 'join'),
+              (payload, [ref]) {})
+          .on(RealtimeListenTypes.presence, ChannelFilter(event: 'leave'),
+              (payload, [ref]) {})
+          .subscribe(((status, [_]) async {
+            if (status == 'SUBSCRIBED') {
+              final status = await myChannel
+                  .track({'online_at': DateTime.now().toIso8601String()});
+            }
+          }));
+
+      return right(true);
+    }
+
+    return left(Failure.empty());
   }
 }

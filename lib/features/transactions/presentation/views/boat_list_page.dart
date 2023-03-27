@@ -18,7 +18,7 @@ class BoatListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Boat location app'),
+        title: Text(context.tr.boatLoc),
       ),
       body: Column(
         children: [
@@ -161,7 +161,7 @@ class ChipsBarWidget extends ConsumerWidget {
             child: Row(
               children: [
                 InputChip(
-                  label: const Text('All'),
+                  label: Text(context.tr.all),
                   selected: viewModel.isFilterByAll(),
                   onSelected: (_) => viewModel.filterByAll(),
                   selectedColor:
@@ -171,7 +171,7 @@ class ChipsBarWidget extends ConsumerWidget {
                   width: 8,
                 ),
                 InputChip(
-                  label: const Text('Available'),
+                  label: Text(context.tr.available),
                   selected: viewModel.isFilterByAvailable(),
                   onSelected: (_) => viewModel.filterByAvailable(),
                   selectedColor: viewModel.isFilterByAvailable()
@@ -182,7 +182,7 @@ class ChipsBarWidget extends ConsumerWidget {
                   width: 8,
                 ),
                 InputChip(
-                  label: const Text('Unavailable'),
+                  label: Text(context.tr.unAvailable),
                   selected: viewModel.isFilterByUnavailable(),
                   onSelected: (_) => viewModel.filterByUnavailable(),
                   selectedColor: viewModel.isFilterByUnavailable()

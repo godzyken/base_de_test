@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../features/common/presentation/screens/error_screen.dart';
 
@@ -93,7 +94,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ],
         ),
       ],
-      observers: [routeObserver],
+      observers: [routeObserver, sentryNavigatorObserver],
       /*   redirect: (state) {
       final loggedIn = authStateListenable.value;
       final goingToLogin = state.subloc.contains('/auth');
@@ -127,3 +128,8 @@ final currentRouteProvider = Provider((ref) {
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
+
+final SentryNavigatorObserver sentryNavigatorObserver = SentryNavigatorObserver(
+    autoFinishAfter: const Duration(seconds: 5),
+    enableAutoTransactions: false,
+    setRouteNameAsTransaction: true);

@@ -26,6 +26,8 @@ dependencies:
   path: 1.8.3
   syncfusion_flutter_datepicker: ^20.4.54
   custom_lint: ^0.3.2
+  sentry: 7.1.0
+  sentry_flutter: 7.1.0
   flutter: 
     sdk: flutter
   flutter_localizations: 
@@ -41,7 +43,7 @@ dev_dependencies:
   freezed: 2.3.2
   riverpod_lint: ^1.1.6
   sqflite_common_ffi: 2.2.2
-  flutter_test: 
+  flutter_test:
     sdk: flutter
 
 flutter: 

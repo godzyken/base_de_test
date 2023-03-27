@@ -14,6 +14,9 @@ class TextInputField extends StatelessWidget {
     this.onEditingComplete,
     this.inputType = TextInputType.text,
     this.validator,
+    this.decoration,
+    this.onFieldSubmitted,
+    this.maxLength,
   }) : super(key: key);
 
   final String label;
@@ -26,7 +29,10 @@ class TextInputField extends StatelessWidget {
   final String? errorText;
   final bool obscureText;
   final TextInputType inputType;
+  final InputDecoration? decoration;
   final FormFieldValidator<String>? validator;
+  final ValueChanged<String>? onFieldSubmitted;
+  final int? maxLength;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +63,8 @@ class TextInputField extends StatelessWidget {
           keyboardType: inputType,
           validator: validator,
           onEditingComplete: onEditingComplete,
+          onFieldSubmitted: onFieldSubmitted,
+          maxLength: maxLength,
         )
       ],
     );

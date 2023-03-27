@@ -1,8 +1,6 @@
-import 'dart:developer';
+import 'dart:developer' as developer;
 
-import 'package:base_de_test/features/common/presentation/utils/extensions/ui_extension.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat/boat_entity.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat/boat_id.dart';
+import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
 import 'package:base_de_test/features/transactions/presentation/controller/boat_notifier.dart';
 import 'package:base_de_test/features/transactions/presentation/viewmodel/boatform/boat_form_viewmodel.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
+import '../../../common/presentation/utils/extensions/extensions.dart';
 
 extension on Boat {
   int get id => 0;
@@ -48,6 +48,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   late TextEditingController _dateTextEditingController;
   final _nameEditingController = TextEditingController();
   final _ownerEditingController = TextEditingController();
+  final _phoneEditingController = TextEditingController();
   final _roleTextController = TextEditingController();
   final _cityTextController = TextEditingController();
   final _zipTextController = TextEditingController();
@@ -68,6 +69,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
   @override
   void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (kFlutterMemoryAllocationsEnabled) {
         boat = ref.watch(boatNotifierProvider);
@@ -78,6 +81,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         );
         _nameEditingController.addListener(_printLatestBoatNameValue);
         _ownerEditingController.addListener(_printLatestOwnerNameValue);
+        _ownerEditingController.addListener(_printLatestOwnerPhoneValue);
         _roleTextController.addListener(_printLatestBoatRoleValue);
         _cityTextController.addListener(_printLatestBoatRoleValue);
         _zipTextController.addListener(_printLatestBoatRoleValue);
@@ -117,13 +121,12 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
         _statesController.addListener(_printLatestControllerValue);
 
-        log('boat on init: $boat');
+        developer.log('boat on init: $boat');
       }
     });
-    _formViewModel = ref.read(boatFormViewModelProvider(widget.boat));
     _dateTextEditingController = TextEditingController(
         text: DateFormat('dd/MM/yyyy').format(DateTime.now()));
-    super.initState();
+    _formViewModel = ref.read(boatFormViewModelProvider(widget.boat));
   }
 
   @override
@@ -171,6 +174,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     _statesController.removeListener(() async {
       _statesController.value.clear();
     });
+    _formViewModel = ref.read(boatFormViewModelProvider(widget.boat));
   }
 
   @override
@@ -207,12 +211,6 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     }
   }
 
-  void onSavedOwnerName(value) {
-    if (_formViewModel.setOwnerName(value) != null) {
-      ref.read(ownerEntityNotifierProvider.notifier).updateOwnerName(value);
-    }
-  }
-
   void onSavedCityName(value) {
     if (_formViewModel.setCityName(value) != null) {
       ref.read(addressNotifierProvider.notifier).updateCity(value);
@@ -238,23 +236,28 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   }
 
   void _printLatestBoatNameValue() {
-    log('print last boat name text field: ${_nameEditingController.text}');
+    developer
+        .log('print last boat name text field: ${_nameEditingController.text}');
   }
 
   void _printLatestOwnerNameValue() {
-    log('print last owner name text field: ${_ownerEditingController.text}');
+    developer.log(
+        'print last owner name text field: ${_ownerEditingController.text}');
   }
 
   void _printLatestBoatRoleValue() {
-    log('print last boat role text field: ${_roleTextController.text}');
+    developer
+        .log('print last boat role text field: ${_roleTextController.text}');
   }
 
-  void _printLatestDateValue() {
-    log('print last Date rang text field: ${_dateTextEditingController.text}');
+  void _printLatestOwnerPhoneValue() {
+    developer.log(
+        'print last Date rang text field: ${_phoneEditingController.text}');
   }
 
   void _printLatestControllerValue() {
-    log('print last start controller state: ${_statesController.value}');
+    developer
+        .log('print last start controller state: ${_statesController.value}');
 
     ref.read(boatNotifierProvider.notifier).updateId(id);
     // Navigator.pop(context, true);
@@ -262,14 +265,24 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   }
 
   void _onCreateBoat() {
-    log('lulu');
+    developer.log('lulu');
     final currentState = _formKey.currentState;
     if (boat != null && currentState!.validate()) {
-      log('lala');
-      ref.read(boatFormStateNotifierProvider.notifier).addBoat(boat!);
-      context.go('boat-list');
+      int id = 1 + DateTime.now().millisecondsSinceEpoch;
+      final newBoat = Boat(
+        boatId: BoatId(value: id++),
+        name: _nameEditingController.text,
+        ownerId: OwnerId(value: id++),
+        addressId: AddressId(value: id++),
+        isAvailable: _formViewModel.isNewBoatValue(),
+        createdAt: _formViewModel.initialCreatedDateValue(),
+        role: _roleTextController.text,
+      );
+      developer.log('boat on create: $newBoat');
+      ref.read(boatFormStateNotifierProvider.notifier).addBoat(newBoat);
+      context.go('/boat-list');
     }
-    log('lolo');
+    developer.log('lolo');
     return;
   }
 
@@ -411,13 +424,17 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
                 onStepContinue: () {
                   bool isLastStep = (currentStep == getSteps().length - 1);
                   if (isLastStep) {
-                    log('last step: $isLastStep');
-                    _formViewModel.createOrUpdateBoat();
+                    setState(() {
+                      developer.log('last step: $isLastStep');
+                      developer.log('last Boat: $boat');
+                      _formViewModel.createOrUpdateBoat();
+                    });
                   } else {
                     setState(() {
-                      log('et la ?');
+                      developer.log('et la ?');
+                      developer.log('last Boat: $Boat');
                       currentStep += 1;
-                      log('current step : $currentStep');
+                      developer.log('current step : $currentStep');
                     });
                   }
                 },
@@ -429,33 +446,38 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
   //-------------------> Boat Identity Form Widget <--------------------------//
   Widget _buildBoatNameFormWidget(BuildContext context) {
-    return TextFormField(
+    return TextInputField(
       controller: _nameEditingController,
       maxLength: 20,
       onFieldSubmitted: onSavedName,
       onChanged: (value) => _formViewModel.setName(value),
       validator: (value) => _formViewModel.validateName(value!),
-      decoration: const InputDecoration(
-        icon: Icon(Icons.edit),
-        labelText: 'Boat Name',
-        helperText: 'Required',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        icon: const Icon(Icons.edit),
+        labelText: context.tr.ownerName,
+        helperText: context.tr.required,
+        border: const OutlineInputBorder(),
       ),
+      hintText: context.tr.enterUsername,
+      label: context.tr.userName,
     );
   }
 
   Widget _buildBoatRoleFormWidget(BuildContext context) {
-    return TextFormField(
+    return TextInputField(
       controller: _roleTextController,
       maxLength: 20,
       onFieldSubmitted: onSavedRole,
       validator: (value) => _formViewModel.validateRole(value!),
-      decoration: const InputDecoration(
-        icon: Icon(Icons.announcement_sharp),
-        labelText: 'Raison',
-        helperText: 'Required',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        icon: const Icon(Icons.announcement_sharp),
+        labelText: context.tr.boatRole,
+        helperText: context.tr.required,
+        border: const OutlineInputBorder(),
       ),
+      hintText: context.tr.boatRole,
+      onChanged: (String value) => _formViewModel.setRole(value),
+      label: context.tr.boatRole,
     );
   }
 
@@ -479,7 +501,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
               size: MediaQuery.of(context).size.width / 20,
             ),
             onTap: () {
-              log("push select types boat");
+              developer.log("push select types boat");
               ref
                   .read(boatNotifierProvider.notifier)
                   .updateTypes(newTypes[index].name);
@@ -548,7 +570,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
               size: MediaQuery.of(context).size.width / 20,
             ),
             onTap: () {
-              log("push select cat boat");
+              developer.log("push select cat boat");
               if (_selectedItems.contains(index)) {
                 setState(() {
                   _selectedItems.removeWhere((element) => element == index);
@@ -563,8 +585,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
               }
             },
             onLongPress: () {
-              log("long push select cat boat");
-              log('message 1: ${!_selectedItems.contains(index)}');
+              developer.log("long push select cat boat");
+              developer.log('message 1: ${!_selectedItems.contains(index)}');
               if (!_selectedItems.contains(index)) {
                 setState(() {
                   _selectedItems.removeWhere(
@@ -580,12 +602,12 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
                     newCat.elementAt(index);
                     _formViewModel.setCategoryCnp(newCat);
                   } else {
-                    log('error 2 somewhere');
+                    developer.log('error 2 somewhere');
                     return;
                   }
                 });
               } else {
-                log('error 1 somewhere');
+                developer.log('error 1 somewhere');
                 return;
               }
             },
@@ -676,33 +698,50 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
   //-------------------> Owner Identity Form Widget <-------------------------//
   Widget _buildOwnerNameFormWidget(BuildContext context) {
-    return TextFormField(
-      controller: _ownerEditingController,
-      maxLength: 150,
-      onFieldSubmitted: onSavedOwnerName,
-      validator: (value) => _formViewModel.validateName(value!),
-      decoration: const InputDecoration(
-        icon: Icon(Icons.view_headline),
-        labelText: 'Owner Name',
-        helperText: 'Required',
-        border: OutlineInputBorder(),
-      ),
-    );
+    final newOwner = ref.read(ownerEntityNotifierProvider.notifier);
+
+    return Consumer(
+        builder: (BuildContext context, WidgetRef ref, Widget? child) {
+      ref.listen(
+          ownerEntityNotifierProvider,
+          (previous, next) => boat?.ownerId?.value != previous?.ownerId.value
+              ? newOwner.updateOwnerId(next.ownerId.value)
+              : previous);
+
+      return TextInputField(
+        controller: _ownerEditingController,
+        maxLength: 150,
+        onFieldSubmitted: (value) => newOwner.updateOwnerName(value),
+        onChanged: (value) => _formViewModel.setOwnerName(value),
+        validator: (value) => _formViewModel.validateName(value!),
+        decoration: InputDecoration(
+          icon: const Icon(Icons.view_headline),
+          labelText: context.tr.enterOwnerName,
+          helperText: context.tr.required,
+          border: const OutlineInputBorder(),
+        ),
+        hintText: context.tr.enterOwnerName,
+        label: context.tr.ownerName,
+      );
+    });
   }
 
   Widget _buildOwnerPhoneFormWidget(BuildContext context) {
-    return TextFormField(
-      controller: _ownerEditingController,
+    return TextInputField(
+      controller: _phoneEditingController,
       maxLength: 16,
       onFieldSubmitted: onSavedOwnerPhone,
-      keyboardType: TextInputType.phone,
+      inputType: TextInputType.phone,
       validator: (value) => _formViewModel.validatePhone(value!),
-      decoration: const InputDecoration(
-        icon: Icon(Icons.add_call),
-        labelText: 'Phone',
-        helperText: 'Required',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        icon: const Icon(Icons.add_call),
+        labelText: context.tr.enterOwnerPhone,
+        helperText: context.tr.required,
+        border: const OutlineInputBorder(),
       ),
+      hintText: context.tr.enterOwnerPhone,
+      label: context.tr.ownerPhone,
+      onChanged: (String value) => _formViewModel.setOwnerPhone(value),
     );
   }
 
@@ -723,11 +762,9 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
           dragStartBehavior: DragStartBehavior.start,
           itemCount: docking.length,
           itemBuilder: (BuildContext context, int index) => ListTile(
-            onTap: () {
-              ref
-                  .read(dockingNotifierProvider.notifier)
-                  .selectDockingType(docking[index]);
-            },
+            onTap: () => ref
+                .read(dockingNotifierProvider.notifier)
+                .selectDockingType(docking[index]),
             title: Text(
               docking[index].name,
               // style: context.textTheme.titleMedium,
@@ -748,32 +785,38 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   }
 
   Widget _buildCityFormWidget(BuildContext context) {
-    return TextFormField(
+    return TextInputField(
       controller: _cityTextController,
       maxLength: 20,
       onFieldSubmitted: onSavedCityName,
       validator: (value) => _formViewModel.validateName(value!),
-      decoration: const InputDecoration(
-        icon: Icon(Icons.directions_boat_sharp),
-        labelText: 'City Name',
-        helperText: 'Required',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        icon: const Icon(Icons.directions_boat_sharp),
+        labelText: context.tr.addressCity,
+        helperText: context.tr.required,
+        border: const OutlineInputBorder(),
       ),
+      hintText: context.tr.enterAddressCity,
+      onChanged: (String value) => _formViewModel.setCityName(value),
+      label: context.tr.addressCity,
     );
   }
 
   Widget _buildZipCodeFormWidget(BuildContext context) {
-    return TextFormField(
+    return TextInputField(
       controller: _zipTextController,
       maxLength: 20,
       onFieldSubmitted: onSavedZipCode,
       validator: (value) => _formViewModel.validateName(value!),
-      decoration: const InputDecoration(
-        icon: Icon(Icons.location_city_rounded),
-        labelText: 'Zip Code',
-        helperText: 'Required',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        icon: const Icon(Icons.location_city_rounded),
+        labelText: context.tr.addressZipCode,
+        helperText: context.tr.required,
+        border: const OutlineInputBorder(),
       ),
+      hintText: context.tr.enterAddressZipCode,
+      onChanged: (String value) => _formViewModel.setZipCode(value),
+      label: context.tr.addressZipCode,
     );
   }
 
@@ -786,11 +829,11 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       maxLength: 70,
       onTap: () => _showDateRangePicker(context),
       validator: (_) => _formViewModel.validateDateInset(),
-      decoration: const InputDecoration(
-        icon: Icon(Icons.calendar_today_rounded),
-        labelText: 'Rental date',
-        helperText: 'Required',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        icon: const Icon(Icons.calendar_today_rounded),
+        labelText: context.tr.rentalDate,
+        helperText: context.tr.required,
+        border: const OutlineInputBorder(),
       ),
     );
   }
@@ -813,7 +856,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         initialEntryMode: DatePickerEntryMode.calendar,
         confirmText: 'Done');
 
-    log('selected Date: $selectedDate');
+    developer.log('selected Date: $selectedDate');
 
     if (selectedDate != null) {
       final newDateSelect = selectedDate;
@@ -878,13 +921,11 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   }
 
   Future<bool> onWillPop() async {
-    final boat = ref.listen(
+    ref.listen(
       boatNotifierProvider.notifier,
-      (previous, next) {
-        next.stream.last == previous?.stream.last
-            ? next.stream
-            : previous?.stream;
-      },
+      (previous, next) => next.stream.last == previous?.stream.last
+          ? next.stream
+          : previous?.stream,
     );
 
     if (_formViewModel.initialAvailableValue()) {
@@ -894,7 +935,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       currentContext?.visitChildElements((element) {
         for (final el in element.debugGetDiagnosticChain()) {
           if (el.dirty) {
-            log('message dirty: $el');
+            developer.log('message dirty: $el');
             if (el.debugIsDefunct) {
               currentWidget?.key;
               reassemble();
