@@ -81,6 +81,25 @@ class _Logger extends ProviderObserver {
       "newValue": "$newValue",
       }''');
   }
+
+  @override
+  void didAddProvider(ProviderBase<Object?> provider, Object? value,
+      ProviderContainer container) {
+    debugPrint('''{
+      "provider": "${provider.name ?? provider.runtimeType}",
+      "value": "$value",
+      "container": "$container",
+      }''');
+  }
+
+  @override
+  void didDisposeProvider(
+      ProviderBase<Object?> provider, ProviderContainer container) {
+    debugPrint('''{
+      "provider": "${provider.name ?? provider.runtimeType}",
+      "container": "$container",
+      }''');
+  }
 }
 
 Future<void> processOrderBatch(ISentrySpan span) async {

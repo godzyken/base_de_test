@@ -1,11 +1,8 @@
-import 'package:base_de_test/features/transactions/domain/entities/address_properties/docking.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat_properties/boat_name.dart';
 import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
-import 'package:base_de_test/features/transactions/domain/entities/owner_properties/owner_name.dart';
-import 'package:base_de_test/features/transactions/domain/repositories/boats_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
 
+// state notifiers
 class BoatNotifier extends StateNotifier<Boat> {
   BoatNotifier(super.state);
 
@@ -67,24 +64,36 @@ class TypesOfBoatNotifier extends StateNotifier<List<TypesOfBoat>> {
     switch (typesOfBoat) {
       case TypesOfBoat.barge:
         typesOfBoat = TypesOfBoat.barge;
+        state = [...state..elementAt(typesOfBoat.index)];
         return typesOfBoat.name;
       case TypesOfBoat.catamaran:
         typesOfBoat = TypesOfBoat.catamaran;
+        state = [...state..elementAt(typesOfBoat.index)];
         return typesOfBoat.name;
       case TypesOfBoat.sailingShips:
         typesOfBoat = TypesOfBoat.sailingShips;
+        state = [...state..elementAt(typesOfBoat.index)];
+
         return typesOfBoat.name;
       case TypesOfBoat.motorShips:
         typesOfBoat = TypesOfBoat.motorShips;
+        state = [...state..elementAt(typesOfBoat.index)];
+
         return typesOfBoat.name;
       case TypesOfBoat.watercraft:
         typesOfBoat = TypesOfBoat.watercraft;
+        state = [...state..elementAt(typesOfBoat.index)];
+
         return typesOfBoat.name;
       case TypesOfBoat.yacht:
         typesOfBoat = TypesOfBoat.yacht;
+        state = [...state..elementAt(typesOfBoat.index)];
+
         return typesOfBoat.name;
       case TypesOfBoat.unknown:
         typesOfBoat = TypesOfBoat.unknown;
+        state = [...state..elementAt(typesOfBoat.index)];
+
         return typesOfBoat.name;
     }
   }
@@ -93,23 +102,97 @@ class TypesOfBoatNotifier extends StateNotifier<List<TypesOfBoat>> {
 class CategoryCnpNotifier extends StateNotifier<List<CategoriesCNP>> {
   CategoryCnpNotifier(super.state);
 
+  void addCat(CategoriesCNP categoriesCNP) => state = [...state, categoriesCNP];
+
+  void removeCat(CategoriesCNP categoriesCNP) =>
+      state = [...state..remove(categoriesCNP)];
+
   String? selectCategoriesCNP(CategoriesCNP cat) {
     switch (cat) {
       case CategoriesCNP.a:
         cat = CategoriesCNP.a;
+        state = [...state..elementAt(cat.index)];
         return cat.name;
       case CategoriesCNP.b:
         cat = CategoriesCNP.b;
+        state = [...state..elementAt(cat.index)];
         return cat.name;
       case CategoriesCNP.c:
         cat = CategoriesCNP.c;
+        state = [...state..elementAt(cat.index)];
         return cat.name;
       case CategoriesCNP.d:
         cat = CategoriesCNP.d;
+        state = [...state..elementAt(cat.index)];
         return cat.name;
       case CategoriesCNP.unknown:
         cat = CategoriesCNP.unknown;
+        state = [...state..elementAt(cat.index)];
         return cat.name;
+    }
+  }
+}
+
+class DockingNotifier extends StateNotifier<List<Docking>> {
+  DockingNotifier(super.state);
+
+  void addDoc(Docking docking) => state = [...state, docking];
+
+  void removeDoc(Docking docking) => state = [...state..remove(docking)];
+
+  String? selectDockingType(Docking doc) {
+    switch (doc) {
+      case Docking.harbor:
+        doc = Docking.harbor;
+        state = [...state..elementAt(doc.index)];
+        return doc.name;
+      case Docking.couple:
+        doc = Docking.couple;
+        state = [...state..elementAt(doc.index)];
+
+        return doc.name;
+      case Docking.marinas:
+        doc = Docking.marinas;
+        state = [...state..elementAt(doc.index)];
+
+        return doc.name;
+      case Docking.anchoring:
+        doc = Docking.anchoring;
+        state = [...state..elementAt(doc.index)];
+
+        return doc.name;
+    }
+  }
+}
+
+class IdentityNumberNotifier extends StateNotifier<List<IdentityNumber>> {
+  IdentityNumberNotifier(super.state);
+
+  void addIdentity(IdentityNumber idN) => state = [...state, idN];
+
+  void removeIdentity(IdentityNumber idN) => state = [...state..remove(idN)];
+
+  String? selectIdentityNumber(IdentityNumber number) {
+    switch (number) {
+      case IdentityNumber.cin:
+        number = IdentityNumber.cin;
+        state = [...state..elementAt(number.index)];
+        return number.name;
+      case IdentityNumber.hin:
+        number = IdentityNumber.hin;
+        state = [...state..elementAt(number.index)];
+
+        return number.name;
+      case IdentityNumber.win:
+        number = IdentityNumber.win;
+        state = [...state..elementAt(number.index)];
+
+        return number.name;
+      case IdentityNumber.unknown:
+        number = IdentityNumber.unknown;
+        state = [...state..elementAt(number.index)];
+
+        return number.name;
     }
   }
 }
@@ -144,7 +227,7 @@ class AddressNotifier extends StateNotifier<AddressEntity> {
   }
 
   void updateDocking(Docking s) {
-    state = state.copyWith(docking: s);
+    state = state.copyWith(docking: s.name);
   }
 
   void updateZipCode(String z) {
@@ -152,7 +235,7 @@ class AddressNotifier extends StateNotifier<AddressEntity> {
   }
 
   void updateGeo(GeoEntity g) {
-    state = state.copyWith(geo: g);
+    state = state.copyWith(geo: g.toString());
   }
 }
 
@@ -168,60 +251,38 @@ class GeoNotifier extends StateNotifier<GeoEntity> {
   }
 }
 
-class DockingNotifier extends StateNotifier<List<Docking>> {
-  DockingNotifier(super.state);
-
-  String? selectDockingType(Docking doc) {
-    switch (doc) {
-      case Docking.harbor:
-        doc = Docking.harbor;
-        return doc.name;
-      case Docking.couple:
-        doc = Docking.couple;
-        return doc.name;
-      case Docking.marinas:
-        doc = Docking.marinas;
-        return doc.name;
-      case Docking.anchoring:
-        doc = Docking.anchoring;
-        return doc.name;
-    }
-  }
-}
-
-class IdentityNumberNotifier extends StateNotifier<List<IdentityNumber>> {
-  IdentityNumberNotifier(super.state);
-
-  String? selectIdentityNumber(IdentityNumber number) {
-    switch (number) {
-      case IdentityNumber.cin:
-        number = IdentityNumber.cin;
-        return number.name;
-      case IdentityNumber.hin:
-        number = IdentityNumber.hin;
-        return number.name;
-      case IdentityNumber.win:
-        number = IdentityNumber.win;
-        return number.name;
-      case IdentityNumber.unknown:
-        number = IdentityNumber.unknown;
-        return number.name;
-    }
-  }
-}
-
-class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
-  BoatFormStateNotifier(this._repository)
+class BoatFormStateController extends StateNotifier<FormBoatAddState> {
+  BoatFormStateController()
       : super(FormBoatAddState(
             Boat.empty(), OwnerEntity.empty(), AddressEntity.empty()));
 
-  final BoatsRepository _repository;
-
-  FormzSubmissionStatus? validator(Boat? b) {
-    if (b!.name.isEmpty) {
+  FormzSubmissionStatus? isBoat(Boat? b) {
+    if (b!.name.isEmpty && b.isAvailable == false) {
+      state = state.copyWith(status: FormzSubmissionStatus.failure);
       return FormzSubmissionStatus.failure;
     } else {
-      return FormzSubmissionStatus.inProgress;
+      state = state.copyWith(status: FormzSubmissionStatus.success);
+      return FormzSubmissionStatus.success;
+    }
+  }
+
+  FormzSubmissionStatus? isOwner(OwnerEntity? ownerEntity) {
+    if (ownerEntity!.name.isEmpty && ownerEntity.phone.isEmpty) {
+      state = state.copyWith(status: FormzSubmissionStatus.failure);
+      return FormzSubmissionStatus.failure;
+    } else {
+      state = state.copyWith(status: FormzSubmissionStatus.success);
+      return FormzSubmissionStatus.success;
+    }
+  }
+
+  FormzSubmissionStatus? isAddress(AddressEntity? addressEntity) {
+    if (addressEntity!.city.isEmpty || addressEntity.docking.isEmpty) {
+      state = state.copyWith(status: FormzSubmissionStatus.failure);
+      return FormzSubmissionStatus.failure;
+    } else {
+      state = state.copyWith(status: FormzSubmissionStatus.success);
+      return FormzSubmissionStatus.success;
     }
   }
 
@@ -244,13 +305,15 @@ class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
 
     late Boat boat;
 
-    if (form.isAvailable) {
-      boat = form.copyWith(isAvailable: true);
+    if (form.isAvailable == true) {
+      boat = form;
+      state = state.copyWith(status: FormzSubmissionStatus.success);
+      state = state.copyWith(boat: boat);
     } else {
-      boat = form.copyWith(isAvailable: false);
+      state = state.copyWith(status: FormzSubmissionStatus.failure);
     }
 
-    state = state.copyWith(boat: form.copyWith(boatId: boat.boatId));
+    state = state.copyWith(boat: boat);
   }
 
   void addOwner(OwnerEntity o) async {
@@ -259,14 +322,14 @@ class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
 
     late OwnerEntity ownerEntity;
 
-    if (form.isValid) {
-      ownerEntity = form.copyWith(isValid: true);
+    if (form.isValid == true) {
+      ownerEntity = form;
+      state = state.copyWith(status: FormzSubmissionStatus.success);
     } else {
-      ownerEntity = form.copyWith(isValid: false);
+      state = state.copyWith(status: FormzSubmissionStatus.failure);
     }
 
-    state = state.copyWith(
-        ownerEntity: form.copyWith(ownerId: ownerEntity.ownerId));
+    state = state.copyWith(ownerEntity: ownerEntity);
   }
 
   void addAddress(AddressEntity a) async {
@@ -279,25 +342,23 @@ class BoatFormStateNotifier extends StateNotifier<FormBoatAddState> {
 
     late AddressEntity addressEntity;
 
-    if (form.docking.name.isNotEmpty) {
-      addressEntity = form.copyWith(
-        docking: a.docking,
-      );
+    if (form.docking.isNotEmpty) {
+      addressEntity = form;
+      state = state.copyWith(status: FormzSubmissionStatus.success);
     } else {
-      addressEntity = form.copyWith(docking: Docking.anchoring);
+      state = state.copyWith(status: FormzSubmissionStatus.failure);
     }
 
-    state = state.copyWith(addressEntity: form.copyWith(id: addressEntity.id));
+    state = state.copyWith(addressEntity: addressEntity);
   }
 
   @override
-  void dispose() {
-    _repository.closeDatabase();
-    super.dispose();
+  bool updateShouldNotify(FormBoatAddState old, FormBoatAddState current) {
+    return current.boatNameFormz!.isValid;
   }
 }
 
-// providers
+// state notifier providers
 final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) =>
     BoatNotifier(Boat(
         boatId: const BoatId(value: 0),
@@ -331,9 +392,10 @@ final addressNotifierProvider =
         AddressNotifier(const AddressEntity(
             id: AddressId(value: 0),
             city: 'city',
-            docking: Docking.anchoring,
+            docking: 'Docking.anchoring.name',
             zipcode: 'zipCode',
-            geo: GeoEntity())));
+            geo: 'GeoEntity()',
+            isValid: false)));
 
 final dockingNotifierProvider =
     StateNotifierProvider<DockingNotifier, List<Docking>>(
@@ -347,31 +409,5 @@ final geoNotifierProvider = StateNotifierProvider<GeoNotifier, GeoEntity>(
     (_) => GeoNotifier(const GeoEntity(lat: 0.0, lng: 0.0)));
 
 final boatFormStateNotifierProvider =
-    StateNotifierProvider<BoatFormStateNotifier, FormBoatAddState>((ref) {
-  final form = ref.notifier;
-  final boat = ref.refresh(boatNotifierProvider);
-  final owner = ref.refresh(ownerEntityNotifierProvider);
-  final address = ref.refresh(addressNotifierProvider);
-
-  form.addBoat(boat);
-  form.addOwner(owner);
-  form.addAddress(address);
-
-  FormBoatAddState(boat, owner, address,
-      formAddressAddState: const FormAddressAddState(
-          cityNameFormz: CityNameFormz.pure(),
-          zipCodeFormz: ZipCodeFormz.pure(),
-          dockingFormz: DockingFormz.pure(),
-          status: FormzSubmissionStatus.initial),
-      formOwnerAddState: const FormOwnerAddState(
-        status: FormzSubmissionStatus.initial,
-        formAddressAddState: FormAddressAddState(),
-        ownerNameFormz: OwnerNameFormz.pure(),
-        ownerPhoneFormz: OwnerPhoneFormz.pure(),
-      ),
-      boatNameFormz: const BoatNameFormz.pure(),
-      boatRoleFormz: const BoatRoleFormz.pure(),
-      status: FormzSubmissionStatus.initial);
-
-  return BoatFormStateNotifier(form._repository);
-});
+    StateNotifierProvider<BoatFormStateController, FormBoatAddState>(
+        (ref) => BoatFormStateController());

@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:base_de_test/features/transactions/domain/usecase_provider.dart';
 import 'package:base_de_test/features/transactions/presentation/viewmodel/boatlist/filter_status_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,19 +40,47 @@ class BoatListViewModel extends StateNotifier<State<BoatList>> {
     }
   }
 
+  testAdd() async {
+    var name = 'name';
+    int ownerId = 3876890;
+    int addressId = 9865433;
+    String identityNumber = 'hin';
+    String typesOfBoat = 'yacht';
+    String cnp = 'c';
+    bool isAvailable = true;
+    DateTime create = DateTime.now();
+    DateTime? deletedAt = DateTime.now();
+    DateTime? rentedAt = DateTime.now();
+    DateTime? returnedAt = DateTime.now();
+    var role = 'name';
+    await _createBoatLocationCase.execute(
+        name,
+        ownerId,
+        addressId,
+        identityNumber,
+        typesOfBoat,
+        cnp,
+        isAvailable,
+        create,
+        deletedAt,
+        rentedAt,
+        returnedAt,
+        role);
+  }
+
   addBoatLocation(
     final String name,
-    final OwnerId ownerId,
+    final int ownerId,
     final bool isAvailable,
-    final AddressId addressId,
-    final IdentityNumber identityNumber,
-    final TypesOfBoat typesOfBoat,
-    final CategoriesCNP cnp,
+    final int addressId,
+    final String identityNumber,
+    final String typesOfBoat,
+    final String cnp,
     final DateTime create,
     final DateTime? removedAt,
     final DateTime? rentAt,
     final DateTime? returnedAt,
-    final String role,
+    final String? role,
   ) async {
     try {
       final newBoat = await _createBoatLocationCase.execute(
@@ -65,8 +95,8 @@ class BoatListViewModel extends StateNotifier<State<BoatList>> {
           removedAt!,
           rentAt!,
           returnedAt!,
-          role);
-
+          role!);
+      developer.log('boatList from addBoatLocation(): $newBoat');
       state = State.success(state.data!.addBoat(newBoat));
     } on Exception catch (e) {
       state = State.error(e);

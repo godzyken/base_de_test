@@ -30,7 +30,7 @@ class BoatListPage extends ConsumerWidget {
           Consumer(builder: (context, ref, _) {
             return ref.watch(_filteredBoatListProvider).maybeWhen(
                 success: (content) =>
-                    _buildBoatListContainerWidget(ref, content),
+                    _buildBoatListContainerWidget(context, ref, content),
                 error: (e) => Expanded(child: Center(child: ErrorWidget(e))),
                 orElse: () => const Expanded(
                         child: Center(
@@ -43,14 +43,16 @@ class BoatListPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildBoatListContainerWidget(WidgetRef ref, final BoatList boatList) {
-    return Expanded(child: _buildBoatListWidget(ref, boatList));
+  Widget _buildBoatListContainerWidget(
+      BuildContext context, WidgetRef ref, final BoatList boatList) {
+    return Expanded(child: _buildBoatListWidget(context, ref, boatList));
   }
 
-  Widget _buildBoatListWidget(final WidgetRef ref, final BoatList boatList) {
+  Widget _buildBoatListWidget(final BuildContext context, final WidgetRef ref,
+      final BoatList boatList) {
     if (boatList.length == 0) {
-      return const Center(
-        child: Text('No Boat'),
+      return Center(
+        child: Text(context.tr.noBoat),
       );
     } else {
       return ListView.builder(

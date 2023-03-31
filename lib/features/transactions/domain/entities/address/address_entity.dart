@@ -10,10 +10,11 @@ class AddressEntity with _$AddressEntity {
   @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
   const factory AddressEntity({
     required AddressId? id,
-    @Default(Docking.anchoring) Docking docking,
+    @Default('Docking.anchoring') String docking,
     @Default('') String city,
     @Default('') String zipcode,
-    GeoEntity? geo,
+    String? geo,
+    @Default(false) bool isValid,
   }) = _AddressEntity;
 
   factory AddressEntity.fromJson(Map<String, dynamic> json) =>
@@ -21,10 +22,11 @@ class AddressEntity with _$AddressEntity {
 
   factory AddressEntity.empty() => const AddressEntity(
       id: AddressId(value: 0),
-      docking: Docking.anchoring,
+      docking: '',
       zipcode: '',
       city: '',
-      geo: GeoEntity());
+      geo: '',
+      isValid: false);
 }
 
 @JsonEnum()

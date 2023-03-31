@@ -2,29 +2,27 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:base_de_test/features/auth/domain/entities/user_properties/name.dart';
-import 'package:base_de_test/features/transactions/domain/entities/boat_properties/boat_name.dart';
-import 'package:base_de_test/features/transactions/domain/entities/owner_properties/owner_name.dart';
 import 'package:base_de_test/features/transactions/presentation/controller/boat_notifier.dart';
+import 'package:base_de_test/features/transactions/presentation/state/app_form_state.dart';
 import 'package:base_de_test/features/transactions/presentation/viewmodel/boatlist/boat_list_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../domain/entities/address_properties/docking.dart';
 import '../../../domain/entities/entities.dart';
 
-class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
-  AddBoatFormViewModel(final Boat? boat, this._boatListViewModel) {
+class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
+  AddBoatFormViewModel(final Boat? boat, this._boatListViewModel)
+      : super(const AppFormState.init()) {
     _initBoat(boat);
   }
   final BoatListViewModel _boatListViewModel;
 
   late BoatId boatId;
-  late OwnerId _ownerId;
-  late AddressId _addressId;
+  late int _ownerId;
+  late int _addressId;
   late StreamSubscription subscription;
   StreamController<int> controller = StreamController<int>();
 
-  final int _id = 0;
   var _name = '';
   OwnerEntity? _owner;
   AddressEntity? _address;
@@ -33,30 +31,33 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
   var _zipCode = '';
   var _ownerPhone = '';
   var _isAvailable = false;
-  IdentityNumber _boatIdentity = IdentityNumber.unknown;
-  TypesOfBoat _types = TypesOfBoat.unknown;
-  CategoriesCNP _cnp = CategoriesCNP.unknown;
+  String _boatIdentity = IdentityNumber.unknown.name;
+  String _types = TypesOfBoat.unknown.name;
+  String _cnp = CategoriesCNP.unknown.name;
   List<Docking> _docking = Docking.values;
   final DateTime _initDate = DateTime.now();
   final DateTime _removeDate = DateTime.now();
   final DateTime _minimal = DateTime(DateTime.now().year);
   final DateTime _maximal = DateTime(DateTime.now().year + 5);
   final DateTimeRange _initDateTimeRange = DateTimeRange(
-      start: DateTime.now(), end: DateTime.now().add(const Duration(days: 7)));
+    start: DateTime.now(),
+    end: DateTime.now().add(const Duration(days: 7)),
+  );
 
   var _raison = '';
   var _isNewBoat = false;
-  int newId = 0;
 
   _initBoat(final Boat? boat) {
+    state = const AppFormState.process();
+    state.isInit;
     subscription = _setUp().listen(
       (event) {
         _boatListViewModel.addListener((state) {
           if (state.isInit && boat!.isAvailable) {
             state.dataStream!.where((element) {
               for (var e in element.values) {
-                newId != 0 ? _id : e.boatId!.value;
-                createOrUpdateBoat();
+                boat.boatId?.value != 0 ? e.boatId!.value : boat.boatId;
+                addNewBoat(e);
                 return true;
               }
 
@@ -67,16 +68,16 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
       },
     );
 
-    developer.log('subscription: $subscription');
-    if (boat == null && newId == 0) {
+    if (boat?.boatId!.value == 0) {
       _isNewBoat = true;
-      // _ownerId = boat!.ownerId!;
-      // _addressId = boat.addressId!;
+      // _addressId = setAddressId(newId++);
+      // _ownerId = setOwnerId(newId++);
+      addNewBoat(state.data);
     } else {
       boatId = boat!.boatId!;
       _name = boat.name;
-      _ownerId = boat.ownerId!;
-      _addressId = boat.addressId!;
+      _ownerId = boat.ownerId!.value;
+      _addressId = boat.addressId!.value;
       _boatIdentity = boat.identityNumber;
       _types = boat.types;
       _cnp = boat.cnp;
@@ -85,13 +86,33 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
     }
   }
 
-  createOrUpdateBoat() {
-    if (_isNewBoat && newId >= 0) {
-      boatId = boatId.copyWith(value: newId++);
-      developer.log('message boat id : $boatId');
-      _addressId = setAddressId(newId++);
-      _ownerId = setOwnerId(newId++);
-      _boatListViewModel.addBoatLocation(
+  Future<void> addNewBoat(final Boat? boat) async {
+    try {
+      developer.log('last Boat save: $boat');
+      final newBoat = await _boatListViewModel.addBoatLocation(
+          boat!.name,
+          boat.ownerId!.value,
+          boat.isAvailable,
+          boat.addressId!.value,
+          boat.identityNumber,
+          boat.types,
+          boat.cnp,
+          boat.createdAt,
+          boat.deletedAt,
+          boat.rentedAt,
+          boat.returnedAt,
+          boat.role);
+      state = AppFormState.success(newBoat);
+    } on Exception catch (e) {
+      state = AppFormState.error(e);
+    }
+  }
+
+  createOrUpdateBoat() async {
+    developer.log('last Boat save: ${state.data}');
+
+    if (_isNewBoat) {
+      final newBoat = _boatListViewModel.addBoatLocation(
         _name,
         _ownerId,
         _isAvailable,
@@ -105,22 +126,24 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
         _initDateTimeRange.end,
         _raison,
       );
+      await addNewBoat(newBoat);
     } else {
       final oldBoat = Boat(
         boatId: BoatId(value: boatId.value),
         name: _name,
-        addressId: _addressId,
+        addressId: AddressId(value: _addressId),
         types: _types,
         identityNumber: _boatIdentity,
         cnp: _cnp,
         isAvailable: _isAvailable,
         createdAt: _initDate,
         role: _raison,
-        ownerId: _ownerId,
+        ownerId: OwnerId(value: _ownerId),
         rentedAt: _initDateTimeRange.start,
         returnedAt: _initDateTimeRange.end,
       );
-      _boatListViewModel.updateBoat(oldBoat);
+      state =
+          AppFormState.success(await _boatListViewModel.updateBoat(oldBoat));
     }
   }
 
@@ -144,13 +167,13 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
   String initialCityNameValue() => _cityName;
   String initialZipCodeValue() => _zipCode;
   String initialOwnerPhoneValue() => _ownerPhone;
-  OwnerId initializeOwnerId() => _ownerId;
-  AddressId initializeAddressId() => _addressId;
+  OwnerId initializeOwnerId() => OwnerId(value: _ownerId);
+  AddressId initializeAddressId() => AddressId(value: _addressId);
   OwnerEntity? initializeOwnerEntityValue() => _owner!;
-  IdentityNumber? initialBoatIdentityValue() => _boatIdentity;
+  IdentityNumber? initialBoatIdentityValue() => IdentityNumber.unknown;
   bool initialAvailableValue() => _isAvailable;
-  TypesOfBoat initialTypesOfBoatValue() => _types;
-  CategoriesCNP initialCnpValue() => _cnp;
+  TypesOfBoat initialTypesOfBoatValue() => TypesOfBoat.unknown;
+  CategoriesCNP initialCnpValue() => CategoriesCNP.unknown;
   List<Docking> initialDockingValue() => _docking;
   DateTime initialCreatedDateValue() => _initDate;
   DateTime datePickerFirstDate() => _minimal;
@@ -365,8 +388,8 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
   setStopLocation(final DateTime value) => _initDateTimeRange.end;
   setIsAvailable(final bool value) => _isAvailable = value;
 
-  setAddressId(final int value) => _addressId.copyWith(value: value);
-  setOwnerId(final int value) => _ownerId.copyWith(value: value);
+  setAddressId(final int value) => AddressId(value: _addressId = value);
+  setOwnerId(final int value) => OwnerId(value: _ownerId = value);
 
   even(final DateTimeRange dateTimeRange, initialAvailableValue) {
     if (setStartLocation(dateTimeRange.start)) {
@@ -379,8 +402,6 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
   String? validateName(String value) {
     if (value.isEmpty) {
       return 'Enter a name';
-    } else if (value.length > 20) {
-      return 'Limit the name to 20 characters';
     } else {
       return value;
     }
@@ -389,8 +410,6 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
   String? validatePhone(String value) {
     if (value.isEmpty) {
       return 'Enter a phone';
-    } else if (value.length > 20) {
-      return 'Limit the name to 20 characters';
     } else {
       return value;
     }
@@ -399,8 +418,6 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
   String? validateRole(String value) {
     if (value.isEmpty) {
       return 'Enter a raison';
-    } else if (value.length > 20) {
-      return 'Limit the name to 20 characters';
     } else {
       return value;
     }
@@ -421,7 +438,7 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
       setIsAvailable(true);
       return 'this boat is available';
     } else if (_isNewBoat &&
-        _initDateTimeRange.start.isAtSameMomentAs(createOrUpdateBoat())) {
+        _initDateTimeRange.start.isAtSameMomentAs(_initDate)) {
       setIsAvailable(true);
       return 'this boat is available';
     } else {
@@ -448,44 +465,12 @@ class AddBoatFormViewModel extends StreamNotifier<AsyncValue<Boat>> {
 
 final boatFormViewModelProvider =
     Provider.autoDispose.family<AddBoatFormViewModel, Boat?>((ref, boat) {
-  developer.log('boat: $boat');
   final boatListViewModel =
-      ref.watch(boatListViewModelStateNotifierProvider.notifier);
-  developer.log('boatListViewModel: $boatListViewModel');
+      ref.read(boatListViewModelStateNotifierProvider.notifier);
 
-  final nextBoat = ref.watch(boatNotifierProvider.notifier);
+  boat = ref.watch(boatNotifierProvider);
 
-/*  final state = ref.state;
-  state.subscription.onData((data) {
-    ref.container.listen(boatStreamProvider, (previous, next) {
-      var boatRin = Boat(
-          boatId: previous?.value?.boatId,
-          name: previous!.value!._name,
-          ownerId: previous.value!._ownerId,
-          addressId: previous.value!._addressId,
-          isAvailable: previous.value!._isAvailable,
-          createdAt: previous.value!._initDate);
-
-      if (boatRin.boatId != next.value?.boatId) {
-        if (next.asData != null) {
-          final newBoat = Boat(
-          boatId: next.value!.boatId,
-          name: next.value!._name,
-          ownerId: next.value!._ownerId,
-          addressId: next.value!._addressId,
-          isAvailable: next.value!._isAvailable,
-          createdAt: next.value!._initDate,
-        );
-          boatRin = newBoat;
-        }
-
-      }
-    });
-    return state.subscription.resume();
-  });*/
-
-  ref.keepAlive();
-  return AddBoatFormViewModel(nextBoat.debugState, boatListViewModel);
+  return AddBoatFormViewModel(boat, boatListViewModel);
 });
 
 final boatListFutureProvider = FutureProvider.autoDispose
@@ -508,7 +493,7 @@ final boatListFutureProvider = FutureProvider.autoDispose
       filter._raison);
 });
 
-final boatStreamProvider =
+/*final boatStreamProvider =
     StreamProvider.autoDispose<AddBoatFormViewModel>((ref) async* {
   final boat = ref.listen(boatFormStateNotifierProvider, (previous, next) {
     ref.state.isRefreshing;
@@ -525,7 +510,7 @@ final boatStreamProvider =
   final addBoat = AddBoatFormViewModel(boatNotifierProvider.read(ref.container),
       boatListViewModelStateNotifierProvider.notifier.read(ref.container));
 
-  ref.onDispose(() => addBoat.subscription.asFuture());
+  ref.onDispose(() => addBoat.subscription.resume());
 
   ref.onAddListener(() {
     addBoat.subscription.onDone(() {
@@ -561,4 +546,4 @@ final boatStreamProvider =
 
     yield addBoat;
   }
-});
+});*/

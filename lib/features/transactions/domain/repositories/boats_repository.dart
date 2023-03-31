@@ -5,11 +5,11 @@ abstract class BoatsRepository {
   Future<BoatList> getBoatList();
   Future<Boat> createBoat(
       final String name,
-      final OwnerId ownerId,
-      final AddressId addressId,
-      final TypesOfBoat types,
-      final IdentityNumber identityNumber,
-      final CategoriesCNP cnp,
+      final int ownerId,
+      final int addressId,
+      final String types,
+      final String identityNumber,
+      final String cnp,
       final bool available,
       final DateTime createdAt,
       final DateTime? deletedAt,

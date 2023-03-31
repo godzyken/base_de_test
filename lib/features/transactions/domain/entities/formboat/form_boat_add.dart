@@ -1,4 +1,3 @@
-import 'package:base_de_test/features/transactions/domain/entities/boat_properties/boat_name.dart';
 import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
 import 'package:formz/formz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

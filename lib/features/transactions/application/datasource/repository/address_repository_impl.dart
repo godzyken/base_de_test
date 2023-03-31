@@ -12,10 +12,11 @@ class AddressRepositoryImpl implements AddressRepository {
   const AddressRepositoryImpl(this.database);
 
   @override
-  Future<AddressEntity> createAddress(Docking docking, String city,
-      String zipcode, GeoEntity geo, bool isValid) async {
+  Future<AddressEntity> createAddress(String docking, String city,
+      String zipcode, String? geo, bool isValid) async {
     final addressEntity = await database.insertAddress(
-        AddressMapper.transformToNewEntityMap(city, zipcode, docking, geo));
+        AddressMapper.transformToNewEntityMap(
+            city, zipcode, docking, geo!, isValid));
 
     return AddressMapper.transformToModel(addressEntity);
   }
@@ -32,11 +33,22 @@ class AddressRepositoryImpl implements AddressRepository {
   }
 
   @override
-  Future<void> updateAddress(AddressId id, Docking docking, String city,
-      String zipcode, GeoEntity geo, bool isValid) async {
+  Future<void> updateAddress(AddressId id, String docking, String city,
+      String zipcode, String geo, bool isValid) async {
     final address = AddressEntity(
-        id: id, docking: docking, city: city, zipcode: zipcode, geo: geo);
+        id: id,
+        docking: docking,
+        city: city,
+        zipcode: zipcode,
+        geo: geo,
+        isValid: isValid);
 
     await database.updateAddress(AddressMapper.transformToMap(address));
+  }
+
+  @override
+  Stream<List<AddressList>> streamAllAddress() {
+    // TODO: implement streamAllAddress
+    throw UnimplementedError();
   }
 }

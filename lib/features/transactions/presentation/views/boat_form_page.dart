@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../common/presentation/utils/extensions/extensions.dart';
@@ -46,6 +45,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   final _rentalDateFormFocusNode = _DisabledFocusNode();
 
   late TextEditingController _dateTextEditingController;
+
   final _nameEditingController = TextEditingController();
   final _ownerEditingController = TextEditingController();
   final _phoneEditingController = TextEditingController();
@@ -73,7 +73,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (kFlutterMemoryAllocationsEnabled) {
-        boat = ref.watch(boatNotifierProvider);
+        boat = ref.read(boatNotifierProvider);
         MemoryAllocations.instance.dispatchObjectCreated(
           library: 'init boat',
           className: 'boat',
@@ -174,7 +174,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     _statesController.removeListener(() async {
       _statesController.value.clear();
     });
-    _formViewModel = ref.read(boatFormViewModelProvider(widget.boat));
+    _formViewModel = ref.refresh(boatFormViewModelProvider(widget.boat));
+    context.dependOnInheritedWidgetOfExactType();
   }
 
   @override
@@ -258,33 +259,51 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   void _printLatestControllerValue() {
     developer
         .log('print last start controller state: ${_statesController.value}');
-
-    ref.read(boatNotifierProvider.notifier).updateId(id);
-    // Navigator.pop(context, true);
-    context.go('/boat-list');
   }
 
-  void _onCreateBoat() {
-    developer.log('lulu');
-    final currentState = _formKey.currentState;
-    if (boat != null && currentState!.validate()) {
-      int id = 1 + DateTime.now().millisecondsSinceEpoch;
-      final newBoat = Boat(
-        boatId: BoatId(value: id++),
-        name: _nameEditingController.text,
-        ownerId: OwnerId(value: id++),
-        addressId: AddressId(value: id++),
-        isAvailable: _formViewModel.isNewBoatValue(),
-        createdAt: _formViewModel.initialCreatedDateValue(),
-        role: _roleTextController.text,
-      );
-      developer.log('boat on create: $newBoat');
-      ref.read(boatFormStateNotifierProvider.notifier).addBoat(newBoat);
-      context.go('/boat-list');
+/*  void _onCreateBoat() async {
+    try {
+      if (boat != null) {
+        developer.log('lulu');
+
+        if (context.mounted) {
+          final newBoat = Boat(
+            boatId: boat?.boatId ??
+                BoatId(value: id = 1 + DateTime.now().millisecondsSinceEpoch),
+            name: boat?.name ?? _nameEditingController.text,
+            ownerId: boat!.ownerId ?? OwnerId(value: id++),
+            addressId: boat!.addressId ?? AddressId(value: id++),
+            isAvailable: boat?.isAvailable ?? _formViewModel.isNewBoatValue(),
+            createdAt:
+                boat?.createdAt ?? _formViewModel.initialCreatedDateValue(),
+            role: boat!.role ?? _roleTextController.text,
+          );
+          developer.log('boat on create: $newBoat');
+
+          var validator = ref
+              .read(boatFormStateNotifierProvider.notifier)
+              .validator(newBoat);
+          developer.log('boat on validate: $validator');
+
+          if (validator != FormzSubmissionStatus.failure) {
+            // developer.log('go to list page');
+            // ref.read(boatFormStateNotifierProvider.notifier).addBoat(newBoat);
+
+            developer.log('go to list page');
+            // pop the current route (uses GoRouter extension)
+            _formViewModel.createOrUpdateBoat(newBoat);
+            context.pop();
+          }
+        } else if (context.findAncestorStateOfType() != null) {
+          context.dependOnInheritedWidgetOfExactType();
+          context.visitAncestorElements((element) => element.dirty);
+        }
+      }
+    } on Exception catch (e) {
+      developer.log('lolo: $e');
+      return;
     }
-    developer.log('lolo');
-    return;
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -333,8 +352,12 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       width: double.infinity,
       child: ElevatedButton(
         statesController: _statesController,
-        onPressed: _onCreateBoat,
-        child: const Text('Save'),
+        onPressed: () {
+          setState(() {
+            _formViewModel.createOrUpdateBoat();
+          });
+        },
+        child: Text(context.tr.save),
       ),
     );
   }
@@ -345,7 +368,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         Step(
           state: currentStep > 0 ? StepState.complete : StepState.indexed,
           isActive: currentStep >= 0,
-          title: const Text("Boat Name"),
+          title: Text(context.tr.boat),
           content: Wrap(
             children: [
               _buildBoatNameFormWidget(context),
@@ -423,16 +446,16 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
                     setState(() => currentStep == 0 ? null : currentStep -= 1),
                 onStepContinue: () {
                   bool isLastStep = (currentStep == getSteps().length - 1);
+                  var form = _formKey.currentState;
                   if (isLastStep) {
+                    form!.validate();
                     setState(() {
-                      developer.log('last step: $isLastStep');
-                      developer.log('last Boat: $boat');
-                      _formViewModel.createOrUpdateBoat();
+                      form.save();
+                      _formViewModel.addNewBoat(boat);
                     });
                   } else {
                     setState(() {
-                      developer.log('et la ?');
-                      developer.log('last Boat: $Boat');
+                      developer.log('last Boat not save: $Boat');
                       currentStep += 1;
                       developer.log('current step : $currentStep');
                     });
@@ -454,12 +477,12 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       validator: (value) => _formViewModel.validateName(value!),
       decoration: InputDecoration(
         icon: const Icon(Icons.edit),
-        labelText: context.tr.ownerName,
+        labelText: context.tr.boatName,
         helperText: context.tr.required,
         border: const OutlineInputBorder(),
       ),
-      hintText: context.tr.enterUsername,
-      label: context.tr.userName,
+      hintText: context.tr.enterBoatName,
+      label: context.tr.boatName,
     );
   }
 
@@ -488,7 +511,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         boat?.id != previous!.boatId!.value ? next : previous;
       });
       return SizedBox.fromSize(
-        size: MediaQuery.of(context).size.flipped / 5.5,
+        size: MediaQuery.of(context).size.flipped / 5,
         child: ListView.builder(
           shrinkWrap: true,
           controller: _selectTypeOfBoatController,
@@ -897,15 +920,15 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
       context: context,
       builder: (_) {
         return AlertDialog(
-          content: const Text('Delete boat?'),
+          content: Text(context.tr.deleteBoat),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('CANCEL'),
+              child: Text(context.tr.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('DELETE'),
+              child: Text(context.tr.deleteBoat),
             ),
           ],
         );

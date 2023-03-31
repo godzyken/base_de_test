@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:base_de_test/features/auth/auth_provider.dart';
 import 'package:base_de_test/features/counter_app/infrastructure/entities/environment.dart';
-import 'package:base_de_test/features/transactions/transaction_provider.dart';
+import 'package:base_de_test/features/transactions/application/datasource/database/boat_database_impl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +11,8 @@ import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 import '../flavors.dart';
 
-final databaseProvider = Provider((ref) => TransactionProvider.instance);
+// final databaseProvider = Provider((ref) => TransactionProvider.instance);
+final databaseProvider = Provider((ref) => BoatDatabaseImpl.instance);
 
 final sharedPreferencesProvider =
     FutureProvider((ref) => SharedPreferences.getInstance());
@@ -25,6 +26,7 @@ final supabaseProvider = FutureProvider<supabase.Supabase>((ref) async {
     url: env.supabaseUrl,
     anonKey: env.supabaseAnonKey,
     debug: kDebugMode,
+    authCallbackUrlHostname: env.supabaseAuthCallbackUrlHostname,
   );
 });
 
@@ -34,6 +36,8 @@ final supabaseClientProvider = Provider<supabase.SupabaseClient>(
 Future<void> initializeProvider(ProviderContainer container) async {
   await container.read(sharedPreferencesProvider.future);
   await container.read(supabaseProvider.future);
+
+  container.read(supabaseClientProvider);
 
   container.read(databaseProvider);
 

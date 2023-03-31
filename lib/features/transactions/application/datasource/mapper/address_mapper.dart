@@ -9,6 +9,7 @@ class AddressMapper {
       zipcode: entity['zip'],
       docking: entity['docking'],
       geo: entity['geo'],
+      isValid: entity['isValid'],
     );
   }
 
@@ -19,17 +20,23 @@ class AddressMapper {
       'zip_code': model.zipcode,
       'docking': model.docking,
       'geo': model.geo,
+      'isValid': model.isValid,
     };
   }
 
-  static s.AddressEntity transformToNewEntityMap(final String city,
-      final String zipcode, final Docking docking, final GeoEntity geo) {
+  static s.AddressEntity transformToNewEntityMap(
+      final String city,
+      final String zipcode,
+      final String docking,
+      final String? geo,
+      final bool isValid) {
     return {
       'id': null,
       'city': city,
       'zip_code': zipcode,
       'docking': docking,
       'geo': geo,
+      'isValid': isValid,
     };
   }
 }

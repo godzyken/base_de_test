@@ -18,14 +18,15 @@ class BoatDatabaseImpl implements SourceBase {
   static const _columnName = 'name';
   static const _columnPhone = 'phone';
   static const _columnAddressId = 'address_id';
-  static const _columnIdentityNumber = 'matricule';
-  static const _columnCategoryCnp = 'cnp';
-  static const _columnAvailable = 'available';
-  static const _columnCreatedAt = 'create_date';
-  static const _columnDeletedAt = 'deleted_date';
-  static const _columnRentedAt = 'rent_date';
-  static const _columnReturnAt = 'return_date';
-  static const _columnRole = 'return_role';
+  static const _columnIdentityNumber = 'identity_number';
+  static const _columnTypesBoat = 'boat_types';
+  static const _columnCategoryCnp = 'cat_cnp';
+  static const _columnAvailable = 'is_available';
+  static const _columnCreatedAt = 'created_at';
+  static const _columnDeletedAt = 'deleted_at';
+  static const _columnRentedAt = 'rented_at';
+  static const _columnReturnAt = 'returned_at';
+  static const _columnRole = 'role';
   static const _columnDocking = 'docking';
   static const _columnCity = 'city';
   static const _columnZipCode = 'zip_code';
@@ -70,6 +71,7 @@ class BoatDatabaseImpl implements SourceBase {
           $_columnId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
           $_columnName TEXT NOT NULL,
           $_columnAvailable BOOLEAN NOT NULL,
+          $_columnTypesBoat TEXT NOT NULL,
           $_columnIdentityNumber TEXT NOT NULL,
           $_columnCategoryCnp TEXT NOT NULL,
           $_columnCreatedAt INTEGER NOT NULL,

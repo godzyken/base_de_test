@@ -1,5 +1,4 @@
 import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
-import 'package:base_de_test/features/transactions/domain/entities/owner_properties/owner_name.dart';
 import 'package:formz/formz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -22,12 +21,6 @@ class FormOwnerAddState with _$FormOwnerAddState {
       includeFromJson: false,
     )
         OwnerPhoneFormz? ownerPhoneFormz,
-    @JsonKey(
-      defaultValue: 'OwnerAddress',
-      includeToJson: false,
-      includeFromJson: false,
-    )
-        FormAddressAddState? formAddressAddState,
     @Default(FormzSubmissionStatus.initial)
         FormzSubmissionStatus? status,
   }) = _FormOwnerAddState;

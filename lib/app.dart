@@ -26,7 +26,6 @@ class _MyAppState extends ConsumerState<MyApp> {
       routeInformationProvider: router.routeInformationProvider,
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
-      showPerformanceOverlay: true,
     );
   }
 }

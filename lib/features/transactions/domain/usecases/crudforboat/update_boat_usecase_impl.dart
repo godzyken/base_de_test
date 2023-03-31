@@ -1,6 +1,6 @@
 import 'package:base_de_test/features/transactions/domain/repositories/boats_repository.dart';
 
-import '../entities/entities.dart';
+import '../../entities/entities.dart';
 import 'update_boat_usecase.dart';
 
 class UpdateBoatLocationUseCaseImpl implements UpdateBoatLocationUseCase {

@@ -40,10 +40,7 @@ mixin _$AuthState {
             @JsonKey(defaultValue: 'AuthUser', includeToJson: false, includeFromJson: false)
                 AuthUser? user)
         authenticated,
-    required TResult Function(
-            @JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false)
-                AuthStatus? status)
-        unauthenticated,
+    required TResult Function(@JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false) AuthStatus? status) unauthenticated,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -54,10 +51,7 @@ mixin _$AuthState {
             @JsonKey(defaultValue: 'AuthUser', includeToJson: false, includeFromJson: false)
                 AuthUser? user)?
         authenticated,
-    TResult? Function(
-            @JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false)
-                AuthStatus? status)?
-        unauthenticated,
+    TResult? Function(@JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false) AuthStatus? status)? unauthenticated,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -68,10 +62,7 @@ mixin _$AuthState {
             @JsonKey(defaultValue: 'AuthUser', includeToJson: false, includeFromJson: false)
                 AuthUser? user)?
         authenticated,
-    TResult Function(
-            @JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false)
-                AuthStatus? status)?
-        unauthenticated,
+    TResult Function(@JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false) AuthStatus? status)? unauthenticated,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -236,10 +227,7 @@ class _$_AuthStateTrue implements _AuthStateTrue {
             @JsonKey(defaultValue: 'AuthUser', includeToJson: false, includeFromJson: false)
                 AuthUser? user)
         authenticated,
-    required TResult Function(
-            @JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false)
-                AuthStatus? status)
-        unauthenticated,
+    required TResult Function(@JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false) AuthStatus? status) unauthenticated,
   }) {
     return authenticated(status, user);
   }
@@ -253,10 +241,7 @@ class _$_AuthStateTrue implements _AuthStateTrue {
             @JsonKey(defaultValue: 'AuthUser', includeToJson: false, includeFromJson: false)
                 AuthUser? user)?
         authenticated,
-    TResult? Function(
-            @JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false)
-                AuthStatus? status)?
-        unauthenticated,
+    TResult? Function(@JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false) AuthStatus? status)? unauthenticated,
   }) {
     return authenticated?.call(status, user);
   }
@@ -270,10 +255,7 @@ class _$_AuthStateTrue implements _AuthStateTrue {
             @JsonKey(defaultValue: 'AuthUser', includeToJson: false, includeFromJson: false)
                 AuthUser? user)?
         authenticated,
-    TResult Function(
-            @JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false)
-                AuthStatus? status)?
-        unauthenticated,
+    TResult Function(@JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false) AuthStatus? status)? unauthenticated,
     required TResult orElse(),
   }) {
     if (authenticated != null) {
@@ -432,10 +414,7 @@ class _$_AuthStateFalse implements _AuthStateFalse {
             @JsonKey(defaultValue: 'AuthUser', includeToJson: false, includeFromJson: false)
                 AuthUser? user)
         authenticated,
-    required TResult Function(
-            @JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false)
-                AuthStatus? status)
-        unauthenticated,
+    required TResult Function(@JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false) AuthStatus? status) unauthenticated,
   }) {
     return unauthenticated(status);
   }
@@ -449,10 +428,7 @@ class _$_AuthStateFalse implements _AuthStateFalse {
             @JsonKey(defaultValue: 'AuthUser', includeToJson: false, includeFromJson: false)
                 AuthUser? user)?
         authenticated,
-    TResult? Function(
-            @JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false)
-                AuthStatus? status)?
-        unauthenticated,
+    TResult? Function(@JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false) AuthStatus? status)? unauthenticated,
   }) {
     return unauthenticated?.call(status);
   }
@@ -466,10 +442,7 @@ class _$_AuthStateFalse implements _AuthStateFalse {
             @JsonKey(defaultValue: 'AuthUser', includeToJson: false, includeFromJson: false)
                 AuthUser? user)?
         authenticated,
-    TResult Function(
-            @JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false)
-                AuthStatus? status)?
-        unauthenticated,
+    TResult Function(@JsonKey(defaultValue: 'AuthStatus', includeFromJson: false, includeToJson: false) AuthStatus? status)? unauthenticated,
     required TResult orElse(),
   }) {
     if (unauthenticated != null) {

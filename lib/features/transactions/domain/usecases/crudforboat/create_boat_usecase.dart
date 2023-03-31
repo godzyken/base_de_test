@@ -1,13 +1,13 @@
-import '../entities/entities.dart';
+import '../../entities/entities.dart';
 
 abstract class CreateBoatLocationCase {
   Future<Boat> execute(
     final String name,
-    final OwnerId ownerId,
-    final AddressId addressId,
-    final IdentityNumber identityNumber,
-    final TypesOfBoat typesOfBoat,
-    final CategoriesCNP cnp,
+    final int ownerId,
+    final int addressId,
+    final String identityNumber,
+    final String typesOfBoat,
+    final String cnp,
     final bool isAvailable,
     final DateTime create,
     final DateTime? deletedAt,

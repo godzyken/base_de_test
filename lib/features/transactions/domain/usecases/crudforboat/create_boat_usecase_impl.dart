@@ -11,11 +11,11 @@ class CreateBoatLocationCaseImpl implements CreateBoatLocationCase {
   @override
   Future<Boat> execute(
     final String name,
-    final OwnerId ownerId,
-    final AddressId addressId,
-    final IdentityNumber identityNumber,
-    final TypesOfBoat types,
-    final CategoriesCNP cnp,
+    final int ownerId,
+    final int addressId,
+    final String identityNumber,
+    final String types,
+    final String cnp,
     final bool isAvailable,
     final DateTime create,
     final DateTime? deletedAt,
