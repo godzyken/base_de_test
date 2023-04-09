@@ -28,6 +28,7 @@ dependencies:
   custom_lint: ^0.3.2
   sentry: 7.1.0
   sentry_flutter: 7.1.0
+  uuid: 3.0.7
   flutter: 
     sdk: flutter
   flutter_localizations: 
@@ -43,7 +44,7 @@ dev_dependencies:
   freezed: 2.3.2
   riverpod_lint: ^1.1.6
   sqflite_common_ffi: 2.2.2
-  flutter_test:
+  flutter_test: 
     sdk: flutter
 
 flutter: 

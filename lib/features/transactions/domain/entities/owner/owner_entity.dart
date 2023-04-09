@@ -1,9 +1,12 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 import '../entities.dart';
 
 part 'owner_entity.freezed.dart';
 part 'owner_entity.g.dart';
+
+var _uuid = const Uuid();
 
 @freezed
 class OwnerEntity with _$OwnerEntity {
@@ -21,6 +24,13 @@ class OwnerEntity with _$OwnerEntity {
 
   factory OwnerEntity.fromJson(Map<String, dynamic> json) =>
       _$OwnerEntityFromJson(json);
+
+  factory OwnerEntity.create(String name, String phone) {
+    return OwnerEntity(
+        ownerId: OwnerId(value: int.parse(_uuid.v4())),
+        name: name,
+        phone: phone);
+  }
 
   factory OwnerEntity.empty() => const OwnerEntity(
       ownerId: OwnerId(value: 0), name: '', phone: '', isValid: false ?? true);

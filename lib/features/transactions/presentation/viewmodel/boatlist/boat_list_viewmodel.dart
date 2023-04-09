@@ -44,61 +44,72 @@ class BoatListViewModel extends StateNotifier<State<BoatList>> {
     var name = 'name';
     int ownerId = 3876890;
     int addressId = 9865433;
-    String identityNumber = 'hin';
-    String typesOfBoat = 'yacht';
-    String cnp = 'c';
+    String typesOfBoat = TypesOfBoat.unknown.name;
+    String identityNumber = IdentityNumber.unknown.name;
+    String cnp = CategoriesCNP.unknown.name;
     bool isAvailable = true;
     DateTime create = DateTime.now();
-    DateTime? deletedAt = DateTime.now();
-    DateTime? rentedAt = DateTime.now();
-    DateTime? returnedAt = DateTime.now();
+    DateTime deletedAt = DateTime.now();
+    DateTime rentedAt = DateTime.now();
+    DateTime returnedAt = DateTime.now();
     var role = 'name';
-    await _createBoatLocationCase.execute(
-        name,
-        ownerId,
-        addressId,
-        identityNumber,
-        typesOfBoat,
-        cnp,
-        isAvailable,
-        create,
-        deletedAt,
-        rentedAt,
-        returnedAt,
-        role);
+    await _createBoatLocationCase.execute(name, ownerId, addressId, typesOfBoat,
+        identityNumber, cnp, isAvailable, create, rentedAt, returnedAt, role);
   }
 
   addBoatLocation(
     final String name,
     final int ownerId,
-    final bool isAvailable,
     final int addressId,
-    final String identityNumber,
     final String typesOfBoat,
+    final String identityNumber,
     final String cnp,
+    final bool isAvailable,
     final DateTime create,
-    final DateTime? removedAt,
-    final DateTime? rentAt,
-    final DateTime? returnedAt,
-    final String? role,
+    final DateTime rentAt,
+    final DateTime returnedAt,
+    final String role,
   ) async {
     try {
+      developer.log('AddBoatLocation(): start try with id: $ownerId');
+
+      state = const State.loading();
       final newBoat = await _createBoatLocationCase.execute(
           name,
           ownerId,
           addressId,
-          identityNumber,
           typesOfBoat,
+          identityNumber,
           cnp,
           isAvailable,
           create,
-          removedAt!,
-          rentAt!,
-          returnedAt!,
-          role!);
+          rentAt,
+          returnedAt,
+          role);
       developer.log('boatList from addBoatLocation(): $newBoat');
+
+      state.maybeWhen(
+          success: (boats) {
+            state = State.success(BoatList(values: [
+              Boat.create(
+                  name,
+                  OwnerId(value: ownerId),
+                  AddressId(value: addressId),
+                  isAvailable,
+                  create,
+                  rentAt,
+                  returnedAt,
+                  role)
+            ]));
+          },
+          loading: () => const State.loading(),
+          init: State.init,
+          error: (err) => State.error(err),
+          orElse: () {});
+
       state = State.success(state.data!.addBoat(newBoat));
     } on Exception catch (e) {
+      developer.log('Error before addBoatLocation(): $e');
       state = State.error(e);
     }
   }
@@ -116,9 +127,9 @@ class BoatListViewModel extends StateNotifier<State<BoatList>> {
           newBoat.isAvailable,
           newBoat.createdAt,
           newBoat.deletedAt!,
-          newBoat.rentedAt!,
-          newBoat.returnedAt!,
-          newBoat.role!);
+          newBoat.rentedAt,
+          newBoat.returnedAt,
+          newBoat.role);
       state = State.success(state.data!.updateBoat(newBoat));
     } on Exception catch (e) {
       state = State.error(e);

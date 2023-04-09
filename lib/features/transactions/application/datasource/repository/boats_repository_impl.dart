@@ -19,24 +19,22 @@ class BoatsRepositoryImpl implements BoatsRepository {
       final String cnp,
       final bool isAvailable,
       final DateTime createdAt,
-      final DateTime? deletedAt,
-      final DateTime? rentedAt,
-      final DateTime? returnedAt,
-      final String? role) async {
+      final DateTime rentedAt,
+      final DateTime returnedAt,
+      final String role) async {
     final boatEntity =
         await database.insertBoat(BoatMapper.transformToNewEntityMap(
       name,
       ownerId,
       addressId,
-      cnp,
+      types,
       identityNumber,
+      cnp,
       isAvailable,
       createdAt,
-      deletedAt!,
-      rentedAt!,
-      returnedAt!,
-      types,
-      role!,
+      rentedAt,
+      returnedAt,
+      role,
     ));
 
     return BoatMapper.transformToModel(boatEntity);
@@ -65,9 +63,9 @@ class BoatsRepositoryImpl implements BoatsRepository {
       final bool isAvailable,
       final DateTime createdAt,
       final DateTime? deletedAt,
-      final DateTime? rentedAt,
-      final DateTime? returnedAt,
-      final String? role) async {
+      final DateTime rentedAt,
+      final DateTime returnedAt,
+      final String role) async {
     final boat = Boat(
       boatId: id,
       name: name,
@@ -78,8 +76,8 @@ class BoatsRepositoryImpl implements BoatsRepository {
       isAvailable: isAvailable,
       createdAt: createdAt,
       deletedAt: deletedAt!,
-      rentedAt: rentedAt!,
-      returnedAt: returnedAt!,
+      rentedAt: rentedAt,
+      returnedAt: returnedAt,
       role: role,
       ownerId: ownerId,
     );

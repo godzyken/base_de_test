@@ -32,6 +32,7 @@ class BoatDatabaseImpl implements SourceBase {
   static const _columnZipCode = 'zip_code';
   static const _columnGeo = 'geo';
   static Database? _database;
+  static Completer<Database>? _initCompleter;
 
   BoatDatabaseImpl._init();
 
@@ -44,9 +45,7 @@ class BoatDatabaseImpl implements SourceBase {
   }
 
   Future<Database> _initDatabase() async {
-    if (_database != null) {
-      return _database!;
-    }
+    if (_database != null) return _database!;
 
     try {
       var databasePath = await getDatabasesPath();
@@ -65,6 +64,16 @@ class BoatDatabaseImpl implements SourceBase {
     }
   }
 
+  Future<Database> _ensureInitialized() async {
+    if (_database != null) return _database!;
+    if (_initCompleter != null) return await _initCompleter!.future;
+    _initCompleter = Completer<Database>();
+    final dtb = await _initDatabase();
+    _database = dtb;
+    _initCompleter?.complete(dtb);
+    return dtb;
+  }
+
   static void _onCreate(Database db, int version) async {
     await db.execute('''
           CREATE TABLE IF NOT EXISTS $_tableName(
@@ -75,7 +84,7 @@ class BoatDatabaseImpl implements SourceBase {
           $_columnIdentityNumber TEXT NOT NULL,
           $_columnCategoryCnp TEXT NOT NULL,
           $_columnCreatedAt INTEGER NOT NULL,
-          $_columnDeletedAt INTEGER NOT NULL,
+          $_columnDeletedAt INTEGER,
           $_columnRentedAt INTEGER NOT NULL,
           $_columnReturnAt INTEGER NOT NULL,
           $_columnRole TEXT NOT NULL,
@@ -115,25 +124,25 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<BoatListEntity> allBoats() async {
-    final db = await database;
+    final db = await _ensureInitialized();
     return db.query(_tableName);
   }
 
   @override
   Future<OwnerListEntity> allOwners() async {
-    final db = await database;
+    final db = await _ensureInitialized();
     return db.query(_tableOwner);
   }
 
   @override
   Future<AddressListEntity> allAddress() async {
-    final db = await database;
+    final db = await _ensureInitialized();
     return db.query(_tableAddress);
   }
 
   @override
   Future<int> deleteAllBoat() async {
-    final db = await database;
+    final db = await _ensureInitialized();
     final res = await db.rawDelete(_tableName);
     log('result: $res');
     return res;
@@ -141,7 +150,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<AddressEntity> insertAddress(final AddressEntity address) async {
-    final db = await database;
+    final db = await _ensureInitialized();
     late final AddressEntity addressEntity;
     await db.transaction((txn) async {
       final id = await txn.insert(
@@ -161,7 +170,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<BoatEntity> insertBoat(final BoatEntity boat) async {
-    final db = await database;
+    final db = await _ensureInitialized();
     late final BoatEntity boatEntity;
     await db.transaction((txn) async {
       final id = await txn.insert(
@@ -181,7 +190,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<OwnerEntity> insertOwner(final OwnerEntity owner) async {
-    final db = await database;
+    final db = await _ensureInitialized();
     late final OwnerEntity ownerEntity;
     await db.transaction((txn) async {
       final id = await txn.insert(
@@ -201,7 +210,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<void> updateAddress(final AddressEntity addressEntity) async {
-    final db = await database;
+    final db = await _ensureInitialized();
     final int id = addressEntity['id'];
     await db.update(
       _tableAddress,
@@ -213,7 +222,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<void> updateBoat(final BoatEntity boatEntity) async {
-    final db = await database;
+    final db = await _ensureInitialized();
     final int id = boatEntity['id'];
     await db.update(
       _tableName,
@@ -225,7 +234,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<void> updateOwner(final OwnerEntity ownerEntity) async {
-    final db = await database;
+    final db = await _ensureInitialized();
     final int id = ownerEntity['id'];
     await db.update(
       _tableOwner,
@@ -237,7 +246,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<int> deleteAddress(final int id) async {
-    final db = await database;
+    final db = await _ensureInitialized();
     return await db.delete(
       _tableAddress,
       where: '$_columnAddressId = ?',
@@ -247,7 +256,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<int> deleteBoat(final int id) async {
-    final db = await database;
+    final db = await _ensureInitialized();
     return await db.delete(
       _tableName,
       where: '$_columnId = ?',
@@ -257,7 +266,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future<int> deleteOwner(final int id) async {
-    final db = await database;
+    final db = await _ensureInitialized();
     return await db.delete(
       _tableOwner,
       where: '$_columnOwnerId = ?',
@@ -267,7 +276,7 @@ class BoatDatabaseImpl implements SourceBase {
 
   @override
   Future close() async {
-    final db = await database;
+    final db = await _ensureInitialized();
     db.close();
   }
 }

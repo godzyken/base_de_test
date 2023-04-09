@@ -12,10 +12,9 @@ abstract class BoatsRepository {
       final String cnp,
       final bool available,
       final DateTime createdAt,
-      final DateTime? deletedAt,
-      final DateTime? rentedAt,
-      final DateTime? returnedAt,
-      final String? role);
+      final DateTime rentedAt,
+      final DateTime returnedAt,
+      final String role);
   Future<void> updateBoat(
       final BoatId id,
       final String name,
@@ -26,10 +25,10 @@ abstract class BoatsRepository {
       final CategoriesCNP cnp,
       final bool isAvailable,
       final DateTime createdAt,
-      final DateTime? deletedAt,
-      final DateTime? rentedAt,
-      final DateTime? returnedAt,
-      final String? role);
+      final DateTime deletedAt,
+      final DateTime rentedAt,
+      final DateTime returnedAt,
+      final String role);
   Future<int> deleteBoat(final BoatId id);
   Future<int> deleteAllBoat();
   Future<void> closeDatabase();

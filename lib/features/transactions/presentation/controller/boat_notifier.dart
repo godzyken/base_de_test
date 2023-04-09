@@ -2,9 +2,32 @@ import 'package:base_de_test/features/transactions/domain/entities/entities.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:formz/formz.dart';
 
+Future<Boat> getBoat(Boat boat) {
+  return Future.delayed(
+      const Duration(seconds: 1),
+      () => Boat(
+          boatId: boat.boatId,
+          name: boat.name,
+          ownerId: boat.ownerId,
+          addressId: boat.addressId,
+          isAvailable: boat.isAvailable,
+          createdAt: boat.createdAt,
+          rentedAt: boat.rentedAt,
+          returnedAt: boat.returnedAt,
+          role: boat.role));
+}
+
+// State Provider
+// Will change by the UI
+// Ui  writes to this and reads from this
+final currentBoatProvider = StateProvider<Boat?>((ref) => null);
+final clockProvider = StateProvider((ref) => DateTime.now());
+
 // state notifiers
 class BoatNotifier extends StateNotifier<Boat> {
-  BoatNotifier(super.state);
+  BoatNotifier([Boat? boat]) : super(boat ?? Boat.empty());
+
+  Boat? previousState;
 
   void updateId(int id) {
     var count = id + 1 + DateTime.now().millisecondsSinceEpoch;
@@ -227,7 +250,7 @@ class AddressNotifier extends StateNotifier<AddressEntity> {
   }
 
   void updateDocking(Docking s) {
-    state = state.copyWith(docking: s.name);
+    state = state.copyWith(docking: s);
   }
 
   void updateZipCode(String z) {
@@ -277,7 +300,7 @@ class BoatFormStateController extends StateNotifier<FormBoatAddState> {
   }
 
   FormzSubmissionStatus? isAddress(AddressEntity? addressEntity) {
-    if (addressEntity!.city.isEmpty || addressEntity.docking.isEmpty) {
+    if (addressEntity!.city.isEmpty || addressEntity.docking.name.isEmpty) {
       state = state.copyWith(status: FormzSubmissionStatus.failure);
       return FormzSubmissionStatus.failure;
     } else {
@@ -342,7 +365,7 @@ class BoatFormStateController extends StateNotifier<FormBoatAddState> {
 
     late AddressEntity addressEntity;
 
-    if (form.docking.isNotEmpty) {
+    if (form.docking.name.isNotEmpty) {
       addressEntity = form;
       state = state.copyWith(status: FormzSubmissionStatus.success);
     } else {
@@ -359,17 +382,23 @@ class BoatFormStateController extends StateNotifier<FormBoatAddState> {
 }
 
 // state notifier providers
-final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) =>
-    BoatNotifier(Boat(
-        boatId: const BoatId(value: 0),
-        name: 'name',
-        addressId: const AddressId(value: 0),
-        types: TypesOfBoat.unknown,
-        identityNumber: IdentityNumber.unknown,
-        cnp: CategoriesCNP.unknown,
-        createdAt: DateTime.now(),
-        isAvailable: false,
-        ownerId: const OwnerId(value: 0))));
+final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) {
+  final now = ref.read(clockProvider);
+  final diff = now.add(const Duration(days: 5));
+  return BoatNotifier(Boat(
+      boatId: const BoatId(value: 0),
+      name: 'name',
+      addressId: const AddressId(value: 0),
+      types: TypesOfBoat.unknown,
+      identityNumber: IdentityNumber.unknown,
+      cnp: CategoriesCNP.unknown,
+      createdAt: now,
+      isAvailable: false,
+      ownerId: const OwnerId(value: 0),
+      rentedAt: now,
+      returnedAt: diff,
+      role: 'role'));
+});
 
 final typesOfBoatNotifierProvider =
     StateNotifierProvider<TypesOfBoatNotifier, List<TypesOfBoat>>(
@@ -392,7 +421,7 @@ final addressNotifierProvider =
         AddressNotifier(const AddressEntity(
             id: AddressId(value: 0),
             city: 'city',
-            docking: 'Docking.anchoring.name',
+            docking: Docking.anchoring,
             zipcode: 'zipCode',
             geo: 'GeoEntity()',
             isValid: false)));

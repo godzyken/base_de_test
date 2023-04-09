@@ -19,9 +19,9 @@ class UpdateBoatLocationUseCaseImpl implements UpdateBoatLocationUseCase {
     final CategoriesCNP cnp,
     final bool isAvailable,
     final DateTime createdAt,
-    final DateTime? deletedAt,
-    final DateTime? rentedAt,
-    final DateTime? returnedAt,
+    final DateTime deletedAt,
+    final DateTime rentedAt,
+    final DateTime returnedAt,
     final String role,
   ) {
     return _repository.updateBoat(
@@ -34,8 +34,8 @@ class UpdateBoatLocationUseCaseImpl implements UpdateBoatLocationUseCase {
       cnp,
       isAvailable,
       createdAt,
-      deletedAt!,
-      returnedAt!,
+      deletedAt,
+      returnedAt,
       returnedAt,
       role,
     );

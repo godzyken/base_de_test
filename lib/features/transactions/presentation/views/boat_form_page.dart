@@ -23,7 +23,10 @@ extension on Boat {
       cnp: cnp,
       isAvailable: isAvailable,
       createdAt: createdAt,
-      ownerId: ownerId);
+      ownerId: ownerId,
+      rentedAt: rentedAt,
+      returnedAt: returnedAt,
+      role: role);
 
   bool get isAvailable => boatId.isAvailable;
 }
@@ -39,6 +42,7 @@ class BoatFormPage extends ConsumerStatefulWidget {
 
 class _BoatFormPageState extends ConsumerState<BoatFormPage> {
   late AddBoatFormViewModel _formViewModel;
+  late BoatFormStateController _formStateController;
   Boat? boat;
   final _formKey = GlobalKey<FormState>();
   final List<int> _selectedItems = [];
@@ -92,7 +96,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
             if (oldLength == ref.read(categoriesCnpNotifierProvider).length) {
               ref
                   .read(categoriesCnpNotifierProvider.notifier)
-                  .selectCategoriesCNP(boat!.cnp);
+                  .selectCategoriesCNP(boat!.cnp as CategoriesCNP);
             }
           }
         });
@@ -103,7 +107,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
             if (oldLength == ref.read(identityNumberNotifierProvider).length) {
               ref
                   .read(identityNumberNotifierProvider.notifier)
-                  .selectIdentityNumber(boat!.identityNumber);
+                  .selectIdentityNumber(boat!.identityNumber as IdentityNumber);
             }
           }
         });
@@ -114,7 +118,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
             if (oldLength == ref.read(typesOfBoatNotifierProvider).length) {
               ref
                   .read(typesOfBoatNotifierProvider.notifier)
-                  .selectTypes(boat!.types);
+                  .selectTypes(boat!.types as TypesOfBoat);
             }
           }
         });
@@ -127,6 +131,8 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     _dateTextEditingController = TextEditingController(
         text: DateFormat('dd/MM/yyyy').format(DateTime.now()));
     _formViewModel = ref.read(boatFormViewModelProvider(widget.boat));
+
+    _formStateController = ref.read(boatFormStateNotifierProvider.notifier);
   }
 
   @override
@@ -145,7 +151,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         if (oldLength == ref.read(categoriesCnpNotifierProvider).length) {
           ref
               .read(categoriesCnpNotifierProvider.notifier)
-              .selectCategoriesCNP(boat!.cnp);
+              .selectCategoriesCNP(boat!.cnp as CategoriesCNP);
         }
       }
     });
@@ -156,7 +162,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         if (oldLength == ref.read(identityNumberNotifierProvider).length) {
           ref
               .read(identityNumberNotifierProvider.notifier)
-              .selectIdentityNumber(boat!.identityNumber);
+              .selectIdentityNumber(boat!.identityNumber as IdentityNumber);
         }
       }
     });
@@ -167,7 +173,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         if (oldLength == ref.read(typesOfBoatNotifierProvider).length) {
           ref
               .read(typesOfBoatNotifierProvider.notifier)
-              .selectTypes(boat!.types);
+              .selectTypes(boat!.types as TypesOfBoat);
         }
       }
     });
@@ -432,9 +438,22 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
-        ref.listen(boatNotifierProvider, (previous, next) {
+        /*  ref.listen(boatNotifierProvider, (previous, next) {
           boat?.id != previous!.boatId!.value ? next : previous;
-        });
+        });*/
+        final currentBoat = ref.watch(
+          addBoatFutureProvider,
+        );
+
+        currentBoat.when(
+          data: (data) => boat == data,
+          error: (_, __) => const Text('Error _:'),
+          loading: () => const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(),
+          ),
+        );
+
         return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -446,16 +465,14 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
                     setState(() => currentStep == 0 ? null : currentStep -= 1),
                 onStepContinue: () {
                   bool isLastStep = (currentStep == getSteps().length - 1);
-                  var form = _formKey.currentState;
                   if (isLastStep) {
-                    form!.validate();
                     setState(() {
-                      form.save();
+                      ref.read(currentBoatProvider.notifier).state = boat;
                       _formViewModel.addNewBoat(boat);
                     });
                   } else {
                     setState(() {
-                      developer.log('last Boat not save: $Boat');
+                      developer.log('last Boat not save: $boat');
                       currentStep += 1;
                       developer.log('current step : $currentStep');
                     });

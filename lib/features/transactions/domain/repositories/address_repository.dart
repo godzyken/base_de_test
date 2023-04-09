@@ -7,7 +7,7 @@ abstract class AddressRepository {
       final String zipcode, final String geo, bool isValid);
   Future<void> updateAddress(
       final AddressId id,
-      final String docking,
+      final Docking docking,
       final String city,
       final String zipcode,
       final String geo,

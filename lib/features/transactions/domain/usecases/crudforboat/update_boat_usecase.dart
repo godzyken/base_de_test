@@ -11,9 +11,9 @@ abstract class UpdateBoatLocationUseCase {
     final CategoriesCNP cnp,
     final bool isAvailable,
     final DateTime createdAt,
-    final DateTime? deletedAt,
-    final DateTime? rentedAt,
-    final DateTime? returnedAt,
+    final DateTime deletedAt,
+    final DateTime rentedAt,
+    final DateTime returnedAt,
     final String role,
   );
 }

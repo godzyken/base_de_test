@@ -33,7 +33,7 @@ class AddressRepositoryImpl implements AddressRepository {
   }
 
   @override
-  Future<void> updateAddress(AddressId id, String docking, String city,
+  Future<void> updateAddress(AddressId id, Docking docking, String city,
       String zipcode, String geo, bool isValid) async {
     final address = AddressEntity(
         id: id,

@@ -19,7 +19,7 @@ class UpdateAddressUseCaseImpl implements UpdateAddressUseCase {
       final bool isValid) {
     return _repository.updateAddress(
       id,
-      docking.name,
+      docking,
       city,
       zipcode,
       geo.toString(),

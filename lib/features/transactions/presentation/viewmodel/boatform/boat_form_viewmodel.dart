@@ -15,6 +15,7 @@ class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
       : super(const AppFormState.init()) {
     _initBoat(boat);
   }
+
   final BoatListViewModel _boatListViewModel;
 
   late BoatId boatId;
@@ -23,20 +24,21 @@ class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
   late StreamSubscription subscription;
   StreamController<int> controller = StreamController<int>();
 
-  var _name = '';
+  AppFormState<Boat>? previousState;
+
+  var _name = 'boatoteau';
   OwnerEntity? _owner;
   AddressEntity? _address;
-  var _ownerName = '';
-  var _cityName = '';
-  var _zipCode = '';
-  var _ownerPhone = '';
+  var _ownerName = 'Akhenathon';
+  var _cityName = 'Marseille';
+  var _zipCode = '13000';
+  var _ownerPhone = '080080080';
   var _isAvailable = false;
   String _boatIdentity = IdentityNumber.unknown.name;
   String _types = TypesOfBoat.unknown.name;
   String _cnp = CategoriesCNP.unknown.name;
   List<Docking> _docking = Docking.values;
   final DateTime _initDate = DateTime.now();
-  final DateTime _removeDate = DateTime.now();
   final DateTime _minimal = DateTime(DateTime.now().year);
   final DateTime _maximal = DateTime(DateTime.now().year + 5);
   final DateTimeRange _initDateTimeRange = DateTimeRange(
@@ -44,97 +46,132 @@ class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
     end: DateTime.now().add(const Duration(days: 7)),
   );
 
-  var _raison = '';
+  var _raison = 'recherche';
   var _isNewBoat = false;
 
   _initBoat(final Boat? boat) {
-    state = const AppFormState.process();
-    state.isInit;
-    subscription = _setUp().listen(
-      (event) {
-        _boatListViewModel.addListener((state) {
-          if (state.isInit && boat!.isAvailable) {
-            state.dataStream!.where((element) {
-              for (var e in element.values) {
-                boat.boatId?.value != 0 ? e.boatId!.value : boat.boatId;
-                addNewBoat(e);
-                return true;
-              }
+    state = const AppFormState.init();
+    if (state.isInit) {
+      state = const AppFormState.process();
+      subscription = _setUp().listen(
+        (event) {
+          _boatListViewModel.addListener((state) {
+            if (state.isInit && boat!.isAvailable) {
+              state.dataStream!.where((element) {
+                for (var e in element.values) {
+                  boat.boatId?.value != 0 ? e.boatId!.value : boat.boatId;
+                  //addNewBoat(e);
+                  return true;
+                }
 
-              return false;
-            });
-          }
-        });
-      },
-    );
+                return false;
+              });
+            }
+          });
+        },
+      );
+    }
 
     if (boat?.boatId!.value == 0) {
       _isNewBoat = true;
       // _addressId = setAddressId(newId++);
       // _ownerId = setOwnerId(newId++);
-      addNewBoat(state.data);
+      //addNewBoat(boat);
     } else {
       boatId = boat!.boatId!;
       _name = boat.name;
       _ownerId = boat.ownerId!.value;
       _addressId = boat.addressId!.value;
-      _boatIdentity = boat.identityNumber;
-      _types = boat.types;
-      _cnp = boat.cnp;
+      _boatIdentity = boat.identityNumber.name;
+      _types = boat.types.name;
+      _cnp = boat.cnp.name;
       _docking = [];
       _isAvailable = boat.isAvailable;
     }
   }
 
-  Future<void> addNewBoat(final Boat? boat) async {
+  _cacheState() {
+    previousState = state;
+  }
+
+  Future<Boat> addNewBoat(final Boat? boat) async {
+    _cacheState();
+    state = const AppFormState.process();
     try {
       developer.log('last Boat save: $boat');
-      final newBoat = await _boatListViewModel.addBoatLocation(
-          boat!.name,
-          boat.ownerId!.value,
-          boat.isAvailable,
-          boat.addressId!.value,
-          boat.identityNumber,
-          boat.types,
-          boat.cnp,
-          boat.createdAt,
-          boat.deletedAt,
-          boat.rentedAt,
-          boat.returnedAt,
-          boat.role);
-      state = AppFormState.success(newBoat);
+
+      final Boat newBoat = await _boatListViewModel.addBoatLocation(
+        boat!.name,
+        boat.ownerId!.value,
+        boat.addressId!.value,
+        boat.types.name,
+        boat.identityNumber.name,
+        boat.cnp.name,
+        boat.isAvailable,
+        boat.createdAt,
+        boat.rentedAt,
+        boat.returnedAt,
+        boat.role,
+      );
+
+      return Future.delayed(const Duration(seconds: 1), () {
+        //return success(newBoat);
+        return state.when(
+            init: () => _initBoat(newBoat),
+            process: () {
+              if (const AppFormState.process().isProcess) {
+                return newBoat;
+              }
+              return Boat.empty();
+            },
+            success: success,
+            error: (error) {
+              AppFormState.error(error);
+              return Boat.empty();
+            });
+      });
     } on Exception catch (e) {
-      state = AppFormState.error(e);
+      developer.log('Error during addBoatLocation(): $e');
+      state.isError;
+      return Boat.empty();
     }
   }
 
+  FutureOr<Boat> success(Boat form) {
+    final newBoat = form;
+    if (newBoat.isAvailable) {
+      AppFormState.success(newBoat);
+      return newBoat;
+    }
+    return Boat.empty();
+  }
+
   createOrUpdateBoat() async {
-    developer.log('last Boat save: ${state.data}');
+    _cacheState();
+    developer.log('first Boat save: ${state.data}');
 
     if (_isNewBoat) {
-      final newBoat = _boatListViewModel.addBoatLocation(
+      state = AppFormState.success(await _boatListViewModel.addBoatLocation(
         _name,
         _ownerId,
-        _isAvailable,
         _addressId,
-        _boatIdentity,
         _types,
+        _boatIdentity,
         _cnp,
+        _isAvailable,
         _initDate,
-        _removeDate,
         _initDateTimeRange.start,
         _initDateTimeRange.end,
         _raison,
-      );
-      await addNewBoat(newBoat);
+      ));
     } else {
       final oldBoat = Boat(
         boatId: BoatId(value: boatId.value),
         name: _name,
         addressId: AddressId(value: _addressId),
-        types: _types,
-        identityNumber: _boatIdentity,
-        cnp: _cnp,
+        types: TypesOfBoat.values.byName(_types),
+        identityNumber: IdentityNumber.values.byName(_boatIdentity),
+        cnp: CategoriesCNP.values.byName(_cnp),
         isAvailable: _isAvailable,
         createdAt: _initDate,
         role: _raison,
@@ -456,11 +493,31 @@ class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
     return controller.stream;
   }
 
-  @override
-  Stream<AsyncData<Boat>> build() {
-    // TODO: implement build
-    throw UnimplementedError();
+/*
+  Stream optionalMap(Stream<AppFormState<Boat>> source, addNewBoat) async* {
+    if (addNewBoat == null) {
+      yield* source;
+    } else {
+      await for (var event in source) {
+        yield addNewBoat(event);
+      }
+    }
   }
+*/
+
+/*  @override
+  AppFormState<Boat> get state {
+    return state.when(
+        init: AppFormState.init,
+        process: AppFormState.process,
+        success: AppFormState.success,
+        error: AppFormState.error);
+  }*/
+
+/*  @override
+  set state(AppFormState value) {
+    state = AppFormState.success(value.data);
+  }*/
 }
 
 final boatFormViewModelProvider =
@@ -468,11 +525,12 @@ final boatFormViewModelProvider =
   final boatListViewModel =
       ref.read(boatListViewModelStateNotifierProvider.notifier);
 
-  boat = ref.watch(boatNotifierProvider);
+  boat = ref.read(boatNotifierProvider);
 
   return AddBoatFormViewModel(boat, boatListViewModel);
 });
 
+// Future Provider
 final boatListFutureProvider = FutureProvider.autoDispose
     .family<List<Boat>, AddBoatFormViewModel>((ref, filter) async {
   final boatListViewModel =
@@ -481,69 +539,23 @@ final boatListFutureProvider = FutureProvider.autoDispose
   return boatListViewModel.addBoatLocation(
       filter._name,
       filter._ownerId,
-      filter._isAvailable,
       filter._addressId,
-      filter._boatIdentity,
       filter._types,
+      filter._boatIdentity,
       filter._cnp,
+      filter._isAvailable,
       filter._initDate,
-      filter._removeDate,
       filter._initDateTimeRange.start,
       filter._initDateTimeRange.end,
       filter._raison);
 });
 
-/*final boatStreamProvider =
-    StreamProvider.autoDispose<AddBoatFormViewModel>((ref) async* {
-  final boat = ref.listen(boatFormStateNotifierProvider, (previous, next) {
-    ref.state.isRefreshing;
-    ref.state.isLoading;
-    ref.state.isReloading;
-    ref.state.unwrapPrevious();
-
-    if (next.status == previous?.status) {
-      next.status;
-    }
-    previous?.status;
-  });
-  ref.keepAlive();
-  final addBoat = AddBoatFormViewModel(boatNotifierProvider.read(ref.container),
-      boatListViewModelStateNotifierProvider.notifier.read(ref.container));
-
-  ref.onDispose(() => addBoat.subscription.resume());
-
-  ref.onAddListener(() {
-    addBoat.subscription.onDone(() {
-      boat.read();
-    });
-
-    addBoat.subscription.onData((data) {
-      boat.read();
-    });
-
-    addBoat.controller.onListen;
-
-    addBoat.controller.add(boat.read().boat.boatId!.value);
-  });
-
-  ref.onRemoveListener(() {
-    boat.close();
-    addBoat.subscription.cancel();
-  });
-
-  ref.onCancel(() {
-    boat.close();
-    addBoat.subscription.cancel();
-  });
-
-  ref.onResume(() {
-    boat.close();
-    addBoat.subscription.resume();
-  });
-
-  await for (final value in addBoat.controller.stream) {
-    if (value == 10) addBoat.controller.sink.close();
-
-    yield addBoat;
+// UI read this to know what to display
+final addBoatFutureProvider = FutureProvider<Boat?>((ref) {
+  final boat = ref.watch(currentBoatProvider);
+  if (boat != null) {
+    return getBoat(boat);
+  } else {
+    return Boat.empty();
   }
-});*/
+});

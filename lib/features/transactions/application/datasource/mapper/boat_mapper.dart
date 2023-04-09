@@ -31,8 +31,8 @@ class BoatMapper {
       'is_available': model.isAvailable ? 1 : 0,
       'created_at': model.createdAt.toIso8601String(),
       'deleted_at': model.deletedAt?.toIso8601String(),
-      'rented_at': model.rentedAt?.toIso8601String(),
-      'returned_at': model.returnedAt?.toIso8601String(),
+      'rented_at': model.rentedAt.toIso8601String(),
+      'returned_at': model.returnedAt.toIso8601String(),
       'role': model.role,
     };
   }
@@ -41,14 +41,13 @@ class BoatMapper {
       final String name,
       final int ownerId,
       final int addressId,
-      final String cnp,
+      final String typesOfBoat,
       final String identityNumber,
+      final String cnp,
       final bool isAvailable,
       final DateTime createdAt,
-      final DateTime? deletedAt,
-      final DateTime? rentedAt,
-      final DateTime? returnedAt,
-      final String typesOfBoat,
+      final DateTime rentedAt,
+      final DateTime returnedAt,
       final String role) {
     return {
       'id': null,
@@ -60,9 +59,8 @@ class BoatMapper {
       'identity_number': identityNumber,
       'is_available': isAvailable ? 1 : 0,
       'created_at': createdAt.toIso8601String(),
-      'deleted_at': deletedAt?.toIso8601String(),
-      'rented_at': rentedAt?.toIso8601String(),
-      'returned_at': returnedAt?.toIso8601String(),
+      'rented_at': rentedAt.toIso8601String(),
+      'returned_at': returnedAt.toIso8601String(),
       'role': role,
     };
   }
