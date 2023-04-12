@@ -161,6 +161,8 @@ final filteredBoatListProvider = Provider.autoDispose<State<BoatList>>((ref) {
           return State.success(boatList.filterByComplete());
         case FilterKind.unavailable:
           return State.success(boatList.filterByIncomplete());
+        case FilterKind.byId:
+          return State.success(boatList.filterByComplete());
       }
     },
     error: (exception) => State.error(exception),

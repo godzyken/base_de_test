@@ -58,6 +58,15 @@ class OwnerList with _$OwnerList {
         }
       }).toList());
 
+  OwnerList filterById(int id) => copyWith(
+          values: values.where((boat) {
+        if (boat.ownerId.value == id) {
+          return boat.isValid;
+        } else {
+          return false;
+        }
+      }).toList());
+
   factory OwnerList.fromJson(Map<String, dynamic> json) =>
       _$OwnerListFromJson(json);
 }

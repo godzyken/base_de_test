@@ -40,4 +40,9 @@ class OwnerRepositoryImpl implements OwnerRepository {
     final ownerListEntity = await database.allOwners();
     return OwnerListMapper.transformToModel(ownerListEntity);
   }
+
+  @override
+  Future<void> closeDatabase() async {
+    await database.close();
+  }
 }

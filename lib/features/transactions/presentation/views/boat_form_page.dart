@@ -96,7 +96,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
             if (oldLength == ref.read(categoriesCnpNotifierProvider).length) {
               ref
                   .read(categoriesCnpNotifierProvider.notifier)
-                  .selectCategoriesCNP(boat!.cnp as CategoriesCNP);
+                  .selectCategoriesCNP(boat!.cnp);
             }
           }
         });
@@ -107,7 +107,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
             if (oldLength == ref.read(identityNumberNotifierProvider).length) {
               ref
                   .read(identityNumberNotifierProvider.notifier)
-                  .selectIdentityNumber(boat!.identityNumber as IdentityNumber);
+                  .selectIdentityNumber(boat!.identityNumber);
             }
           }
         });
@@ -118,7 +118,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
             if (oldLength == ref.read(typesOfBoatNotifierProvider).length) {
               ref
                   .read(typesOfBoatNotifierProvider.notifier)
-                  .selectTypes(boat!.types as TypesOfBoat);
+                  .selectTypes(boat!.types);
             }
           }
         });
@@ -220,19 +220,19 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
 
   void onSavedCityName(value) {
     if (_formViewModel.setCityName(value) != null) {
-      ref.read(addressNotifierProvider.notifier).updateCity(value);
+      ref.read(addressFormStateNotifierProvider.notifier).updateCityName(value);
     }
   }
 
   void onSavedZipCode(value) {
     if (_formViewModel.setZipCode(value) != null) {
-      ref.read(addressNotifierProvider.notifier).updateZipCode(value);
+      ref.read(addressFormStateNotifierProvider.notifier).updateZipCode(value);
     }
   }
 
   void onSavedOwnerPhone(value) {
     if (_formViewModel.setOwnerPhone(value) != null) {
-      ref.read(ownerEntityNotifierProvider.notifier).updateOwnerPhone(value);
+      ref.read(ownerFormStateNotifierProvider.notifier).updateName(value);
     }
   }
 
@@ -489,7 +489,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     return TextInputField(
       controller: _nameEditingController,
       maxLength: 20,
-      onFieldSubmitted: onSavedName,
+      onFieldSubmitted: (value) => onSavedName(value),
       onChanged: (value) => _formViewModel.setName(value),
       validator: (value) => _formViewModel.validateName(value!),
       decoration: InputDecoration(
@@ -507,7 +507,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     return TextInputField(
       controller: _roleTextController,
       maxLength: 20,
-      onFieldSubmitted: onSavedRole,
+      onFieldSubmitted: (value) => onSavedRole(value),
       validator: (value) => _formViewModel.validateRole(value!),
       decoration: InputDecoration(
         icon: const Icon(Icons.announcement_sharp),
@@ -753,7 +753,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
         maxLength: 150,
         onFieldSubmitted: (value) => newOwner.updateOwnerName(value),
         onChanged: (value) => _formViewModel.setOwnerName(value),
-        validator: (value) => _formViewModel.validateName(value!),
+        validator: (value) => _formViewModel.validateOwnerName(value!),
         decoration: InputDecoration(
           icon: const Icon(Icons.view_headline),
           labelText: context.tr.enterOwnerName,
@@ -770,7 +770,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     return TextInputField(
       controller: _phoneEditingController,
       maxLength: 16,
-      onFieldSubmitted: onSavedOwnerPhone,
+      onFieldSubmitted: (value) => onSavedOwnerPhone(value),
       inputType: TextInputType.phone,
       validator: (value) => _formViewModel.validatePhone(value!),
       decoration: InputDecoration(
@@ -828,7 +828,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     return TextInputField(
       controller: _cityTextController,
       maxLength: 20,
-      onFieldSubmitted: onSavedCityName,
+      onFieldSubmitted: (value) => onSavedCityName(value),
       validator: (value) => _formViewModel.validateName(value!),
       decoration: InputDecoration(
         icon: const Icon(Icons.directions_boat_sharp),
@@ -846,7 +846,7 @@ class _BoatFormPageState extends ConsumerState<BoatFormPage> {
     return TextInputField(
       controller: _zipTextController,
       maxLength: 20,
-      onFieldSubmitted: onSavedZipCode,
+      onFieldSubmitted: (value) => onSavedZipCode(value),
       validator: (value) => _formViewModel.validateName(value!),
       decoration: InputDecoration(
         icon: const Icon(Icons.location_city_rounded),

@@ -32,7 +32,11 @@ final deleteOwnerUseCaseProvider = Provider<DeleteOwnerEntityCase>(
     (ref) => DeleteOwnerEntityCaseImpl(ref.watch(ownerRepoProvider)));
 
 //<---------------------/ Address provider CRUD section /----------------------------->//
-
+/*
+* Use Link Gps.fr web
+[https://www.coordonnees-gps.fr/latitude-longitude/48.856614/2.352221/10/roadmap]
+*
+*/
 final getAddressListUseCaseProvider = Provider<GetAddressListUseCase>(
     (ref) => GetAddressListUseCaseImpl(ref.watch(addressRepoProvider)));
 

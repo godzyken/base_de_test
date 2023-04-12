@@ -159,7 +159,7 @@ class BoatDatabaseImpl implements SourceBase {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       final results = await txn.query(
-        _tableAddress,
+        _tableName,
         where: '$_columnAddressId = ?',
         whereArgs: [id],
       );
@@ -199,7 +199,7 @@ class BoatDatabaseImpl implements SourceBase {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       final results = await txn.query(
-        _tableOwner,
+        _tableName,
         where: '$_columnOwnerId = ?',
         whereArgs: [id],
       );

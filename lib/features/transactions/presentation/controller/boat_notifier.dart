@@ -23,7 +23,8 @@ Future<Boat> getBoat(Boat boat) {
 final currentBoatProvider = StateProvider<Boat?>((ref) => null);
 final clockProvider = StateProvider((ref) => DateTime.now());
 
-// state notifiers
+//<--------------------- Class State Notifiers ------------------------------>//
+
 class BoatNotifier extends StateNotifier<Boat> {
   BoatNotifier([Boat? boat]) : super(boat ?? Boat.empty());
 
@@ -274,6 +275,8 @@ class GeoNotifier extends StateNotifier<GeoEntity> {
   }
 }
 
+//<------------------ Class FormState notifier controllers ------------------>//
+
 class BoatFormStateController extends StateNotifier<FormBoatAddState> {
   BoatFormStateController()
       : super(FormBoatAddState(
@@ -281,30 +284,48 @@ class BoatFormStateController extends StateNotifier<FormBoatAddState> {
 
   FormzSubmissionStatus? isBoat(Boat? b) {
     if (b!.name.isEmpty && b.isAvailable == false) {
-      state = state.copyWith(status: FormzSubmissionStatus.failure);
+      state = state.copyWith(boat: b, status: FormzSubmissionStatus.failure);
       return FormzSubmissionStatus.failure;
+    } else if (b.name.isNotEmpty || b.role.isNotEmpty) {
+      state = state.copyWith(boat: b, status: FormzSubmissionStatus.inProgress);
+      return FormzSubmissionStatus.inProgress;
     } else {
-      state = state.copyWith(status: FormzSubmissionStatus.success);
+      state = state.copyWith(boat: b, status: FormzSubmissionStatus.success);
       return FormzSubmissionStatus.success;
     }
   }
 
   FormzSubmissionStatus? isOwner(OwnerEntity? ownerEntity) {
     if (ownerEntity!.name.isEmpty && ownerEntity.phone.isEmpty) {
-      state = state.copyWith(status: FormzSubmissionStatus.failure);
+      state = state.copyWith(
+          ownerEntity: ownerEntity, status: FormzSubmissionStatus.failure);
       return FormzSubmissionStatus.failure;
+    } else if (ownerEntity.name.isNotEmpty || ownerEntity.phone.isNotEmpty) {
+      state = state.copyWith(
+          ownerEntity: ownerEntity, status: FormzSubmissionStatus.inProgress);
+      return FormzSubmissionStatus.inProgress;
     } else {
-      state = state.copyWith(status: FormzSubmissionStatus.success);
+      state = state.copyWith(
+          ownerEntity: ownerEntity, status: FormzSubmissionStatus.success);
       return FormzSubmissionStatus.success;
     }
   }
 
   FormzSubmissionStatus? isAddress(AddressEntity? addressEntity) {
     if (addressEntity!.city.isEmpty || addressEntity.docking.name.isEmpty) {
-      state = state.copyWith(status: FormzSubmissionStatus.failure);
+      state = state.copyWith(
+          addressEntity: addressEntity, status: FormzSubmissionStatus.failure);
       return FormzSubmissionStatus.failure;
+    } else if (addressEntity.city.isNotEmpty ||
+        addressEntity.docking.name.isNotEmpty ||
+        addressEntity.geo!.isNotEmpty) {
+      state = state.copyWith(
+          addressEntity: addressEntity,
+          status: FormzSubmissionStatus.inProgress);
+      return FormzSubmissionStatus.inProgress;
     } else {
-      state = state.copyWith(status: FormzSubmissionStatus.success);
+      state = state.copyWith(
+          addressEntity: addressEntity, status: FormzSubmissionStatus.success);
       return FormzSubmissionStatus.success;
     }
   }
@@ -330,13 +351,10 @@ class BoatFormStateController extends StateNotifier<FormBoatAddState> {
 
     if (form.isAvailable == true) {
       boat = form;
-      state = state.copyWith(status: FormzSubmissionStatus.success);
-      state = state.copyWith(boat: boat);
+      state = state.copyWith(boat: boat, status: FormzSubmissionStatus.success);
     } else {
       state = state.copyWith(status: FormzSubmissionStatus.failure);
     }
-
-    state = state.copyWith(boat: boat);
   }
 
   void addOwner(OwnerEntity o) async {
@@ -347,12 +365,11 @@ class BoatFormStateController extends StateNotifier<FormBoatAddState> {
 
     if (form.isValid == true) {
       ownerEntity = form;
-      state = state.copyWith(status: FormzSubmissionStatus.success);
+      state = state.copyWith(
+          ownerEntity: ownerEntity, status: FormzSubmissionStatus.success);
     } else {
       state = state.copyWith(status: FormzSubmissionStatus.failure);
     }
-
-    state = state.copyWith(ownerEntity: ownerEntity);
   }
 
   void addAddress(AddressEntity a) async {
@@ -367,12 +384,11 @@ class BoatFormStateController extends StateNotifier<FormBoatAddState> {
 
     if (form.docking.name.isNotEmpty) {
       addressEntity = form;
-      state = state.copyWith(status: FormzSubmissionStatus.success);
+      state = state.copyWith(
+          addressEntity: addressEntity, status: FormzSubmissionStatus.success);
     } else {
       state = state.copyWith(status: FormzSubmissionStatus.failure);
     }
-
-    state = state.copyWith(addressEntity: addressEntity);
   }
 
   @override
@@ -381,7 +397,163 @@ class BoatFormStateController extends StateNotifier<FormBoatAddState> {
   }
 }
 
-// state notifier providers
+class OwnerFormStateController extends StateNotifier<FormOwnerAddState> {
+  OwnerFormStateController() : super(const FormOwnerAddState());
+
+  FormzSubmissionStatus? validate(
+      {OwnerNameFormz? nameFormz, OwnerPhoneFormz? phoneFormz}) {
+    for (var f in FormzSubmissionStatus.values) {
+      switch (f) {
+        case FormzSubmissionStatus.initial:
+          f.isInitial;
+          state = state.copyWith(
+              ownerNameFormz: nameFormz,
+              ownerPhoneFormz: phoneFormz,
+              status: FormzSubmissionStatus.initial);
+          return FormzSubmissionStatus.initial;
+        case FormzSubmissionStatus.inProgress:
+          f.isInProgress;
+          state = state.copyWith(
+              ownerNameFormz: nameFormz,
+              ownerPhoneFormz: phoneFormz,
+              status: FormzSubmissionStatus.inProgress);
+          return FormzSubmissionStatus.inProgress;
+        case FormzSubmissionStatus.success:
+          f.isSuccess;
+          state = state.copyWith(
+              ownerNameFormz: nameFormz,
+              ownerPhoneFormz: phoneFormz,
+              status: FormzSubmissionStatus.success);
+          return FormzSubmissionStatus.success;
+        case FormzSubmissionStatus.failure:
+          f.isFailure;
+          state = state.copyWith(
+              ownerNameFormz: nameFormz,
+              ownerPhoneFormz: phoneFormz,
+              status: FormzSubmissionStatus.failure);
+          return FormzSubmissionStatus.failure;
+        case FormzSubmissionStatus.canceled:
+          f.isCanceled;
+          state = state.copyWith(
+              ownerNameFormz: nameFormz,
+              ownerPhoneFormz: phoneFormz,
+              status: FormzSubmissionStatus.canceled);
+          return FormzSubmissionStatus.canceled;
+      }
+    }
+    return null;
+  }
+
+  updateName(String value) {
+    final name = OwnerNameFormz.dirty(value);
+    state =
+        state.copyWith(ownerNameFormz: name, status: validate(nameFormz: name));
+  }
+
+  updatePhone(String value) {
+    final phone = OwnerPhoneFormz.dirty(value);
+    state = state.copyWith(
+        ownerPhoneFormz: phone, status: validate(phoneFormz: phone));
+  }
+
+  @override
+  bool updateShouldNotify(FormOwnerAddState old, FormOwnerAddState current) {
+    return current.ownerNameFormz!.isValid;
+  }
+}
+
+class AddressFormStateController extends StateNotifier<FormAddressAddState> {
+  AddressFormStateController() : super(const FormAddressAddState());
+
+  FormzSubmissionStatus? validate(
+      {DockingFormz? dockingFormz,
+      CityNameFormz? cityNameFormz,
+      ZipCodeFormz? zipCodeFormz}) {
+    for (var f in FormzSubmissionStatus.values) {
+      switch (f) {
+        case FormzSubmissionStatus.initial:
+          f.isInitial;
+          state = state.copyWith(
+            dockingFormz: dockingFormz,
+            cityNameFormz: cityNameFormz,
+            zipCodeFormz: zipCodeFormz,
+            status: FormzSubmissionStatus.initial,
+          );
+          return FormzSubmissionStatus.initial;
+        case FormzSubmissionStatus.inProgress:
+          f.isInProgress;
+          state = state.copyWith(
+            dockingFormz: dockingFormz,
+            cityNameFormz: cityNameFormz,
+            zipCodeFormz: zipCodeFormz,
+            status: FormzSubmissionStatus.inProgress,
+          );
+          return FormzSubmissionStatus.inProgress;
+        case FormzSubmissionStatus.success:
+          f.isSuccess;
+          state = state.copyWith(
+            dockingFormz: dockingFormz,
+            cityNameFormz: cityNameFormz,
+            zipCodeFormz: zipCodeFormz,
+            status: FormzSubmissionStatus.success,
+          );
+          return FormzSubmissionStatus.success;
+        case FormzSubmissionStatus.failure:
+          f.isFailure;
+          state = state.copyWith(
+            dockingFormz: dockingFormz,
+            cityNameFormz: cityNameFormz,
+            zipCodeFormz: zipCodeFormz,
+            status: FormzSubmissionStatus.failure,
+          );
+          return FormzSubmissionStatus.failure;
+        case FormzSubmissionStatus.canceled:
+          f.isCanceled;
+          state = state.copyWith(
+            dockingFormz: dockingFormz,
+            cityNameFormz: cityNameFormz,
+            zipCodeFormz: zipCodeFormz,
+            status: FormzSubmissionStatus.canceled,
+          );
+          return FormzSubmissionStatus.canceled;
+      }
+    }
+    return null;
+  }
+
+  updateDocking(String value) {
+    final dock = DockingFormz.dirty(value);
+    state = state.copyWith(
+      dockingFormz: dock,
+      status: FormzSubmissionStatus.success,
+    );
+  }
+
+  updateCityName(String value) {
+    final city = CityNameFormz.dirty(value);
+    state = state.copyWith(
+      cityNameFormz: city,
+      status: FormzSubmissionStatus.success,
+    );
+  }
+
+  updateZipCode(String value) {
+    final zip = ZipCodeFormz.dirty(value);
+    state = state.copyWith(
+      zipCodeFormz: zip,
+      status: FormzSubmissionStatus.success,
+    );
+  }
+
+  @override
+  bool updateShouldNotify(
+      FormAddressAddState old, FormAddressAddState current) {
+    return current.cityNameFormz!.isValid;
+  }
+}
+
+//<--------------- Static state notifier providers -------------------------->//
+
 final boatNotifierProvider = StateNotifierProvider<BoatNotifier, Boat>((ref) {
   final now = ref.read(clockProvider);
   final diff = now.add(const Duration(days: 5));
@@ -437,6 +609,16 @@ final identityNumberNotifierProvider =
 final geoNotifierProvider = StateNotifierProvider<GeoNotifier, GeoEntity>(
     (_) => GeoNotifier(const GeoEntity(lat: 0.0, lng: 0.0)));
 
+//<--------------- Static formState notifier provider ----------------------->//
+
 final boatFormStateNotifierProvider =
     StateNotifierProvider<BoatFormStateController, FormBoatAddState>(
         (ref) => BoatFormStateController());
+
+final ownerFormStateNotifierProvider =
+    StateNotifierProvider<OwnerFormStateController, FormOwnerAddState>(
+        (ref) => OwnerFormStateController());
+
+final addressFormStateNotifierProvider =
+    StateNotifierProvider<AddressFormStateController, FormAddressAddState>(
+        (ref) => AddressFormStateController());

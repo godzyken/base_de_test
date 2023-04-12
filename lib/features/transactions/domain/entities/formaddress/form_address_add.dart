@@ -27,6 +27,12 @@ class FormAddressAddState with _$FormAddressAddState {
       includeFromJson: false,
     )
         ZipCodeFormz? zipCodeFormz,
+    @JsonKey(
+      defaultValue: 'Geo coordonné',
+      includeToJson: false,
+      includeFromJson: false,
+    )
+        GeoCoordFormz? geoCoordFormz,
     @Default(FormzSubmissionStatus.initial)
         FormzSubmissionStatus? status,
     String? errorMessage,

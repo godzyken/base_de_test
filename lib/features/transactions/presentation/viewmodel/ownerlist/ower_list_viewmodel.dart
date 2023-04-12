@@ -1,5 +1,10 @@
+import 'dart:developer' as developer;
+
 import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
+import 'package:base_de_test/features/transactions/domain/usecase_provider.dart';
 import 'package:base_de_test/features/transactions/domain/usecases/uses_cases.dart';
+import 'package:base_de_test/features/transactions/presentation/controller/boat_notifier.dart';
+import 'package:base_de_test/features/transactions/presentation/viewmodel/boatlist/filter_status_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../state/state.dart';
@@ -42,10 +47,26 @@ class OwnerListViewModel extends StateNotifier<State<OwnerList>> {
     final bool isValid,
   ) async {
     try {
+      developer.log('AddOwner(): start try with id: $name');
+
+      state = const State.loading();
       final newOwner =
           await _createOwnerEntityCase.execute(name, phone, isValid);
+      developer.log('ownerList from addOwner(): $newOwner');
+
+      state.maybeWhen(
+          success: (owners) {
+            state = State.success(
+                OwnerList(values: [OwnerEntity.create(name, phone)]));
+          },
+          loading: () => const State.loading(),
+          init: State.init,
+          error: (err) => State.error(err),
+          orElse: () {});
+
       state = State.success(state.data!.addOwner(newOwner));
     } on Exception catch (e) {
+      developer.log('Error before addOwner(): $e');
       state = State.error(e);
     }
   }
@@ -73,3 +94,36 @@ class OwnerListViewModel extends StateNotifier<State<OwnerList>> {
     }
   }
 }
+
+final ownerListViewModelStateNotifierProvider =
+    StateNotifierProvider.autoDispose<OwnerListViewModel, State<OwnerList>>(
+        (ref) => OwnerListViewModel(
+              ref.watch(getOwnerListUseCaseProvider),
+              ref.watch(createOwnerUseCaseProvider),
+              ref.watch(deleteOwnerUseCaseProvider),
+              ref.watch(updateOwnerUseCaseProvider),
+            ));
+
+final filteredOwnerListProvider = Provider.autoDispose<State<OwnerList>>((ref) {
+  final filterKind = ref.watch(filterKindViewModelStateNotifierProvider);
+  final ownerListState = ref.watch(ownerListViewModelStateNotifierProvider);
+  final ownerId =
+      ref.watch(ownerEntityNotifierProvider.select((value) => value.ownerId));
+
+  return ownerListState.when(
+      init: () => const State.init(),
+      loading: () => const State.loading(),
+      success: (ownerList) {
+        switch (filterKind) {
+          case FilterKind.all:
+            return State.success(ownerList);
+          case FilterKind.available:
+            return State.success(ownerList.filterByComplete());
+          case FilterKind.unavailable:
+            return State.success(ownerList.filterByIncomplete());
+          case FilterKind.byId:
+            return State.success(ownerList.filterById(ownerId.value));
+        }
+      },
+      error: (error) => State.error(error));
+});

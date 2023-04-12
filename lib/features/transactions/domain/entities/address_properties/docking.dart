@@ -1,29 +1,45 @@
+import 'package:base_de_test/features/transactions/domain/entities/entities.dart';
 import 'package:formz/formz.dart';
 
 import '../../../../auth/domain/entities/user_properties/name.dart';
 
-class DockingFormz extends FormzInput<String, NameValidationError> {
+class DockingFormz extends FormzInput<String, Docking> {
   const DockingFormz.pure([super.value = '']) : super.pure();
   const DockingFormz.dirty([super.value = '']) : super.dirty();
 
-  @override
-  NameValidationError? validator(String value) {
-    if (value.isEmpty) {
-      return NameValidationError.empty;
-    } else if (value.length < 3) {
-      return NameValidationError.invalid;
-    } else {
-      return null;
+  String? selectDockingType(Docking doc) {
+    switch (doc) {
+      case Docking.harbor:
+        doc = Docking.harbor;
+        return doc.name;
+      case Docking.couple:
+        doc = Docking.couple;
+        return doc.name;
+      case Docking.marinas:
+        doc = Docking.marinas;
+        return doc.name;
+      case Docking.anchoring:
+        doc = Docking.anchoring;
+        return doc.name;
     }
   }
 
-  static String? showStreetNameErrorMessage(NameValidationError? error) {
-    if (error == NameValidationError.empty) {
-      return 'Empty Street name';
-    } else if (error == NameValidationError.invalid) {
-      return 'Too short street name';
-    } else {
-      return null;
+  @override
+  Docking? validator(String value) {
+    for (var doc in Docking.values) {
+      switch (doc) {
+        case Docking.harbor:
+          break;
+        case Docking.couple:
+          // TODO: Handle this case.
+          break;
+        case Docking.marinas:
+          // TODO: Handle this case.
+          break;
+        case Docking.anchoring:
+          // TODO: Handle this case.
+          break;
+      }
     }
   }
 }
@@ -196,6 +212,29 @@ class LongFormz extends FormzInput<String, GeoLocationError> {
       return 'Invalid longitude';
     } else if (error == GeoLocationError.short) {
       return 'longitude too short';
+    } else {
+      return null;
+    }
+  }
+}
+
+class GeoCoordFormz extends FormzInput<String, GeoLocationError> {
+  const GeoCoordFormz.pure([super.value = '']) : super.pure();
+  const GeoCoordFormz.dirty([super.value = '']) : super.dirty();
+
+  static const _lng = LongFormz.pure();
+  static const _lat = LatFormz.pure();
+
+  @override
+  GeoLocationError? validator(String value) {
+    _lat.value == value;
+    _lng.value == value;
+    if (_lat.value.isEmpty || _lng.value.isEmpty) {
+      return GeoLocationError.empty;
+    } else if (_lng.isNotValid || _lat.isNotValid) {
+      return GeoLocationError.invalid;
+    } else if (_lng.error != null || _lat.error != null) {
+      return GeoLocationError.invalid;
     } else {
       return null;
     }

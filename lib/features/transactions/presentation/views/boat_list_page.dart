@@ -157,6 +157,7 @@ class ChipsBarWidget extends ConsumerWidget {
     return Consumer(builder: (context, ref, _) {
       final viewModel = ref.watch(_provider.notifier);
       ref.watch(_provider);
+
       return SingleChildScrollView(
         child: Padding(
             padding: const EdgeInsets.only(left: 8, right: 8),

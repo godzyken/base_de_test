@@ -7,4 +7,5 @@ abstract class OwnerRepository {
   Future<void> updateOwner(final OwnerId id, final String name,
       final String phone, final bool isValid);
   Future<int> deleteOwner(final OwnerId id);
+  Future<void> closeDatabase();
 }

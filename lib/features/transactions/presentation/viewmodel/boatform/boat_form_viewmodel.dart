@@ -5,6 +5,7 @@ import 'package:base_de_test/features/auth/domain/entities/user_properties/name.
 import 'package:base_de_test/features/transactions/presentation/controller/boat_notifier.dart';
 import 'package:base_de_test/features/transactions/presentation/state/app_form_state.dart';
 import 'package:base_de_test/features/transactions/presentation/viewmodel/boatlist/boat_list_viewmodel.dart';
+import 'package:base_de_test/features/transactions/presentation/viewmodel/ownerlist/ower_list_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,6 +23,7 @@ class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
   late int _ownerId;
   late int _addressId;
   late StreamSubscription subscription;
+  late OwnerListViewModel _ownerListViewModel;
   StreamController<int> controller = StreamController<int>();
 
   AppFormState<Boat>? previousState;
@@ -146,24 +148,56 @@ class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
     return Boat.empty();
   }
 
+  Future<OwnerEntity> addNewOwner(
+      final Boat? boat, final OwnerEntity? ownerEntity) async {
+    _cacheState();
+    state = const AppFormState.process();
+
+    try {
+      developer.log('last Owner save: $ownerEntity');
+
+      final OwnerEntity newOwner = await _ownerListViewModel.addOwner(
+          ownerEntity!.name, ownerEntity.phone, ownerEntity.isValid);
+
+      return Future.delayed(const Duration(seconds: 3), () {
+        return state.when(
+            init: _initBoat(boat),
+            process: () {
+              if (const AppFormState.process().isProcess) {
+                return OwnerEntity.create(newOwner.name, newOwner.phone);
+              }
+              return OwnerEntity.empty();
+            },
+            success: successOwner,
+            error: (error) {
+              AppFormState.error(error);
+              return OwnerEntity.empty();
+            });
+      });
+    } on Exception catch (e) {
+      developer.log('Error during addNewOwner(): $e');
+      state.isError;
+      return OwnerEntity.empty();
+    }
+  }
+
+  FutureOr<OwnerEntity> successOwner(Boat form) {
+    OwnerEntity? ownerEntity;
+    if (form.ownerId != null) {
+      final saveOwner =
+          OwnerEntity.create(ownerEntity!.name, ownerEntity.phone);
+      AppFormState.success(saveOwner);
+      return saveOwner;
+    }
+    return OwnerEntity.empty();
+  }
+
   createOrUpdateBoat() async {
     _cacheState();
     developer.log('first Boat save: ${state.data}');
 
     if (_isNewBoat) {
-      state = AppFormState.success(await _boatListViewModel.addBoatLocation(
-        _name,
-        _ownerId,
-        _addressId,
-        _types,
-        _boatIdentity,
-        _cnp,
-        _isAvailable,
-        _initDate,
-        _initDateTimeRange.start,
-        _initDateTimeRange.end,
-        _raison,
-      ));
+      state = AppFormState.success(await addNewBoat(state.data));
     } else {
       final oldBoat = Boat(
         boatId: BoatId(value: boatId.value),
@@ -184,8 +218,16 @@ class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
     }
   }
 
-  createOrUpdateOwner(String id) {
-    if (id.isNotEmpty) {}
+  FutureOr<OwnerEntity> createOrUpdateOwner(String name, String phone) async {
+    _cacheState();
+    developer.log('first Owner save: ${state.data}');
+    final data = state.data;
+    if (data?.ownerId != null) {
+      final newOwner = OwnerEntity.create(name, phone);
+      AppFormState.success(await addNewOwner(data, newOwner));
+      return newOwner;
+    }
+    return OwnerEntity.empty();
   }
 
   createOrUpdateAddress() {}
@@ -437,27 +479,55 @@ class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
   }
 
   String? validateName(String value) {
-    if (value.isEmpty) {
-      return 'Enter a name';
-    } else {
-      return value;
+    final BoatNameFormz boatNameFormz = BoatNameFormz.dirty(value);
+    boatNameFormz.validator(value);
+    if (boatNameFormz.isNotValid) {
+      return BoatNameFormz.showBoatNameErrorMessage(boatNameFormz.error);
+    } else if (boatNameFormz.isPure) {
+      return boatNameFormz.value;
+    } else if (boatNameFormz.isValid) {
+      return boatNameFormz.value;
     }
+    return null;
+  }
+
+  String? validateOwnerName(String value) {
+    final OwnerNameFormz ownerNameFormz = OwnerNameFormz.dirty(value);
+    ownerNameFormz.validator(value);
+    if (ownerNameFormz.isNotValid) {
+      return OwnerNameFormz.showOwnerNameErrorMessage(ownerNameFormz.error);
+    } else if (ownerNameFormz.isPure) {
+      return ownerNameFormz.value;
+    } else if (ownerNameFormz.isValid) {
+      return ownerNameFormz.value;
+    }
+    return null;
   }
 
   String? validatePhone(String value) {
-    if (value.isEmpty) {
-      return 'Enter a phone';
-    } else {
-      return value;
+    final OwnerPhoneFormz phoneFormz = OwnerPhoneFormz.dirty(value);
+    phoneFormz.validator(value);
+    if (phoneFormz.isNotValid) {
+      return OwnerPhoneFormz.showPhoneFormatErrorMessage(phoneFormz.error);
+    } else if (phoneFormz.isPure) {
+      return phoneFormz.value;
+    } else if (phoneFormz.isValid) {
+      return phoneFormz.value;
     }
+    return null;
   }
 
   String? validateRole(String value) {
-    if (value.isEmpty) {
-      return 'Enter a raison';
-    } else {
-      return value;
+    final BoatRoleFormz roleFormz = BoatRoleFormz.dirty(value);
+    roleFormz.validator(value);
+    if (roleFormz.isNotValid) {
+      return BoatRoleFormz.showBoatRoleErrorMessage(roleFormz.error);
+    } else if (roleFormz.isPure) {
+      return roleFormz.value;
+    } else if (roleFormz.isValid) {
+      return roleFormz.value;
     }
+    return null;
   }
 
   String? validateDateInset() {
@@ -515,9 +585,9 @@ class AddBoatFormViewModel extends StateNotifier<AppFormState<Boat>> {
   }*/
 
 /*  @override
-  set state(AppFormState value) {
-    state = AppFormState.success(value.data);
-  }*/
+    set state(AppFormState value) {
+      state = AppFormState.success(value.data);
+    }*/
 }
 
 final boatFormViewModelProvider =

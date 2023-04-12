@@ -51,4 +51,9 @@ class AddressRepositoryImpl implements AddressRepository {
     // TODO: implement streamAllAddress
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> closeDatabase() async {
+    await database.close();
+  }
 }

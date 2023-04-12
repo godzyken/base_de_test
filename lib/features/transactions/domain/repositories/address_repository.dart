@@ -13,4 +13,5 @@ abstract class AddressRepository {
       final String geo,
       final bool isValid);
   Future<int> deleteAddress(final AddressId id);
+  Future<void> closeDatabase();
 }
